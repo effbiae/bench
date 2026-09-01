@@ -1,0 +1,54 @@
+#!/usr/bin/python3
+import subprocess,sys,os,json
+suites='knucleotide nbody'.split()
+rge={'knucleotide':(20,24),'nbody':(18,26)}
+gen={'fasta':(9,26)}
+dep={'knucleotide':'fasta'}
+imp={'gcc':('gcc','c'),'growler':('k','k'),'python3':('python3','py'),}
+gcc_opts='-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp'
+cores=','.join(subprocess.run(
+        'cat $(find /sys/devices/system/cpu -regex ".*cpu[0-9]+/topology/thread_siblings_list") |sort -n |uniq |cut -d, -f1',
+        shell=True, capture_output=True, text=True, check=True).stdout.split())
+exec_opts='--walltimelimit 5s --memlimit 1GB  --cores '+cores
+def system(x):print(x);return os.system(x)>>8
+def syso(x):return system('cd o;'+x)
+if not os.path.exists('o'):os.mkdir('o')
+for x in dep:
+ j=dep[x]
+ if not os.path.exists(f'o/{j}'):syso(f'gcc {gcc_opts} ../s/{j}/{j}.c -o{j}')
+for g in rge:
+ r=rge[g]
+ system(f'gcc {gcc_opts} s/{g}/{g}.c -oo/{g}')
+ for i in range(*r):
+  check=f'{g}-{i}-check';inp=''
+  if g in dep:
+   gi=f'{dep[g]}-{i}'
+   inp=f'--input {gi}'
+   if not os.path.exists(f'o/{gi}'):syso(f'timeout 1 ./{dep[g]} {2**i}>{gi}')
+  if not os.path.exists(f'o/{check}'):
+   syso(f'runexec {exec_opts} --output {check} {inp} -- ./{g} {2**i}')
+#run python reference to find n for each test
+if not os.path.exists('o/n'):
+ n={}
+ for s in suites:
+  g=rge[s]
+  for i in range(*g):
+   inp=f'--input {dep[s]}-{i}'if s in dep else''
+   r=syso(f'runexec {exec_opts} {inp} --output /tmp/f -- python3 ../s/{s}/{s}.py {2**i}|grep returnvalue=0\\$')
+   if 0==r:assert(0==system(f"bash -c 'diff <(tail +7 /tmp/f) <(tail +7 o/{s}-{i}-check)'"))
+   else:n[s]=i-1;break
+ with open('o/n','w') as f:json.dump(n,f)
+with open('o/n') as f:n=json.load(f)
+print(n)
+for k in n:
+ o=f'{k}.out';syso(f'rm {o}')
+ inp=f'--input {dep[k]}-{n[k]}'if k in dep else''
+ exec_o='--walltimelimit 30s --memlimit 1GB  --cores '+cores
+ for i in imp:
+  bn=f'{k}.py'if i=='python3'else k if i=='gcc'else f'{k}.{i}.{imp[i][1]}';
+  exe=f'{imp[i][0]} ../s/{k}/{bn}' if i!='gcc' else './'+k
+  syso(f'echo IMP {i} >>{o}')
+  for _ in range(4):
+   syso(f'runexec {exec_o} {inp} --output /tmp/f -- {exe} {2**n[k]} 2>/dev/null >>{o}')
+   if 0==_:assert(0==syso(f"bash -c 'diff <(tail +7 /tmp/f) <(tail +7 {k}-{n[k]}-check)'"))
+
