@@ -10,7 +10,7 @@ p=(ggplot(n) + geom_boxplot(aes(x="factor(imp)", y="norm"))
  + labs(title="How many times slower? (quartiles)",
         x="Language Implementation",
         y="Program elapsed seconds%fastest program"))
-p.save('site/h.svg')
+p.save('h.svg')
 h=(merge(n,n.groupby(['suite','imp'])['norm'].median(),on=['suite','imp'])
    .groupby(['suite','imp']).first()
 ).sort_values(by=['suite','norm_y'])
@@ -41,6 +41,6 @@ for n,x in n.groupby('suite'):
    </tr>"""
  t+=("<tr>")
 t+=("</table>")
-with open('site/index.html','w')as f:
+with open('index.html','w')as f:
  with open('index.tmpl')as g:
   f.write(g.read().replace('<table>',t))
