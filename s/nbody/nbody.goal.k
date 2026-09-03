@@ -19,12 +19,11 @@ S:       ("sun";(0. 0 0;0. 0 0;SOLARMASS)
 S@:&2!!#S
 PAIRS:+cmb[2;!#S]
 
-deltav:{[dt;p]S0:S@*p; p1:*S0;v1:S0 1;m1:S0 2
-              S1:S@p 1;p2:*S1;v2:S1 1;m2:S1 2
-        d:p1-p2;mag:dt*1%x*sqrt x:+/d*d
-        (v1-d*mag*m2;v2+d*mag*m1)}
-adv:{[dt]{[dt;x]S::@[S;x;:;{@[S x;1;:;y]}'[x;deltav[dt;x]]]}[dt]'PAIRS
-         {[dt;x]S::@[S;x;{[dt;x;y;z](x+dt*y;y;z)}[dt].]}[dt]'!#S;dt}
+deltav:{[dt;p](p1;v1;m1):S@*p; (p2;v2;m2):S@*|p
+              d:p1-p2; mag:dt*1%x*sqrt x:+/d*d
+              (v1-d*mag*m2;v2+d*mag*m1)}
+adv:{[dt]1{[dt|;x]S[x]:{@[S x;1;:;y]}'[x;deltav[dt;x]]}/PAIRS
+         1{[dt|;x]S::@[S;x;{[dt|x;y;z](x+dt*y;y;z)}.]}/!#S;dt}
 advance:{y adv/x}
 
 r0:{S0:*S;S1:S 1;
