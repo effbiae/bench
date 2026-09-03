@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from plotnine import*;from pandas import *
+from plotnine import*;from pandas import *;import subprocess
 t=read_csv("o/run.csv")
 n=merge(t,t.query('imp=="gcc"').groupby('suite')['walltime'].median(),on='suite')
 n['norm']=n['walltime_x']/n['walltime_y']
@@ -25,14 +25,17 @@ t='''<table>
 for n,x in n.groupby('suite'):
  b=merge(x,x.groupby('imp')['norm'].median()).groupby('imp').first().sort_values(by='norm')
  for i,r in b.iterrows():
-  bn=f'{n}-{i}.ext'
-  i=f'https://github.com/effbiae/bench/s/{n}/{bn}'
+  k=n
+  imp={'gcc':('gcc','c'),'growler':('k','k'),'python3':('python3','py'),'goal':('goal','k')}
+  bn=f'{k}.py'if i=='python3'else f'{k}.c' if i=='gcc'else f'{k}.{i}.{imp[i][1]}';
+  i=f'https://github.com/effbiae/bench/blob/master/s/{n}/{bn}'
+  gz=len(subprocess.run(f'gzip -c s/{n}/{bn}', shell=True, capture_output=True, text=False, check=True).stdout)
   t+=f"""<tr>
    <td>{r['norm']:#.3g}
    <td><a href="{i}">{bn}</a>
    <td>{r['walltime_x']:>6.2f}
    <td>{round(r['memory']/1e3):>10}
-   <td>gz
+   <td>{gz}
    <th>{r['cputime']:>6.2f}
    </tr>"""
  t+=("<tr>")
