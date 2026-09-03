@@ -18,73 +18,18 @@ BODIES:!/+0N 2#(`sun;(0. 0 0;0. 0 0;SOLARMASS)
                 5.15138902046611451e-05 * SOLARMASS))
 S:.BODIES
 PAIRS:+cmb[2;!#S]
-/
-def advance(dt, n, bodies=S, pairs=PAIRS):
 
-    for i in range(n):
-        for (([x1, y1, z1], v1, m1),
-             ([x2, y2, z2], v2, m2)) in pairs:
-            dx = x1 - x2
-            dy = y1 - y2
-            dz = z1 - z2
-            mag = dt * ((dx * dx + dy * dy + dz * dz) ** (-1.5))
-            b1m = m1 * mag
-            b2m = m2 * mag
-            v1[0] -= dx * b2m
-            v1[1] -= dy * b2m
-            v1[2] -= dz * b2m
-            v2[0] += dx * b1m
-            v2[1] += dy * b1m
-            v2[2] += dz * b1m
-        for (r, [vx, vy, vz], m) in bodies:
-            r[0] += dt * vx
-            r[1] += dt * vy
-            r[2] += dt * vz
-\
 deltav:{[dt;p]((p1;v1;m1);(p2;v2;m2)):S p
         d:p1-p2;mag:dt*1%x*%x:+/d*d
         (v1-d*mag*m2;v2+d*mag*m1)}
 adv:{[dt]{[dt;x]S::@[S;x;:;{@[S x;1;:;y]}'[x;deltav[dt;x]]]}[dt]'PAIRS
          {[dt;x]S::@[S;x;{[dt;x;y;z](x+dt*y;y;z)}[dt].]}[dt]'!#S;dt}
 advance:{y adv/x}
-/
 
-def report_energy(bodies=S, pairs=PAIRS, e=0.0):
+r0:{((p1;v1;m1);(p2;v2;m2)):S x;d:p1-p2;(m1*m2)%%+/d*d}
+r1:{(-+/(r0'PAIRS))++/{(p;v;m):x;m*(+/v*v)%2.}'S}
+report:{`0:{"-0."/"-."\?[x;2#-9+#x:$_0.5+1e9*x;"."]}r1`}
 
-    for (((x1, y1, z1), v1, m1),
-         ((x2, y2, z2), v2, m2)) in pairs:
-        dx = x1 - x2
-        dy = y1 - y2
-        dz = z1 - z2
-        e -= (m1 * m2) / ((dx * dx + dy * dy + dz * dz) ** 0.5)
-    for (r, [vx, vy, vz], m) in bodies:
-        e += m * (vx * vx + vy * vy + vz * vz) / 2.
-    print("%.9f" % e)
-\
-reportp:{((p1;v1;m1);(p2;v2;m2)):S x;d:p1-p2;(m1*m2)%%+/d*d}
-reportx:{(-+/(reportp'PAIRS))++/{(p;v;m):x;m*(+/v*v)%2.}'S}
-report:{`0:{"-0."/"-."\?[x;2#-9+#x:$_0.5+1e9*x;"."]}reportx`}
-/
-def offset_momentum(ref, bodies=S, px=0.0, py=0.0, pz=0.0):
-
-    for (r, [vx, vy, vz], m) in bodies:
-        px -= vx * m
-        py -= vy * m
-        pz -= vz * m
-    (r, v, m) = ref
-    v[0] = px / m
-    v[1] = py / m
-    v[2] = pz / m
-\
 offset:{p:-+/{(p;v;m):x;v*m}'S;S[0;1]:p%S[0;2]}
-/
-def main(n, ref='sun'):
-    offset_momentum(BODIES[ref])
-    report_energy()
-    advance(0.01, n)
-    report_energy()
 
-if __name__ == '__main__':
-    main(int(sys.argv[1]))
-\
 {offset`;report`;advance[0.01;x];report`}`I$*x

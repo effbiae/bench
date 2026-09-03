@@ -1,0 +1,36 @@
+<html><head><title>benchmarking array languages</title>
+<style><!--
+
+a{color:black;text-decoration:none}article,footer,header{margin:auto;max-width:31em;width:92%}body{font:100% Droid Sans, Ubuntu, Verdana, sans-serif;margin:0;-webkit-text-size-adjust:100%}h3, h1, h2 a, li a{font-family:Ubuntu Mono,Consolas,Menlo,monospace}article,footer{padding:0 0 2.9em}h3{font-size:1.4em;font-weight:bold;margin:0;padding: .4em}h3, h3 a{color:white;background-color:#77216f}h3 small{font-size:0.64em}h1,h2{margin:1.5em 0 0}h1{font-size:1.4em;font-weight:normal}h2{font-size:1.2em}nav li{list-style-type:none;vertical-align:top}li a{display:block;font-size:1.2em;margin: .5em .5em 0;padding: .5em .5em .3em}ul{clear:left;margin:-0.3em 0 1.5em;padding-left:0;text-align:center}p{color:#333;line-height:1.4;margin: .3em 0 0}.external{border-bottom:.1em dashed #333}p a,span{border-bottom: .1em solid #333;padding-bottom: .1em}h1 a{border-bottom: .1em solid #333}blockquote{margin-top: .3em}blockquote p{display:inline}blockquote:before,q:before{content:open-quote}blockquote:after,q:after{content:close-quote}body{quotes:'\201C''\201D''\2018''\2019''\2039''\203A'}img{display:block;margin:2.6em auto}@media only screen and (min-width: 33em){li{display:inline-block}}@media only screen and (min-width: 60em){article,footer,header{font-size:1.25em}}
+table{color:#333;margin:1.3em auto 0;text-align:right}tbody::after{content:"-";display:block;line-height:2.6em;visibility:hidden}td{border-bottom: .15em dotted #eee;padding: .7em 0 0 1em}td a, th a{display:block}th{font-weight:normal;padding:0 0 0 1em}td:first-child{padding-left:0}td:nth-child(2),th:nth-child(2){text-align:left}
+
+
+@media only screen{th:nth-child(1),td:nth-child(1),th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5),th:nth-child(6),td:nth-child(6),th:nth-child(7),td:nth-child(7){display:none}}
+@media only screen and (min-width:23em){th:nth-child(1),td:nth-child(1){display:table-cell}}@media only screen and (min-width:37em){th:nth-child(3),td:nth-child(3),th:nth-child(4),td:nth-child(4),th:nth-child(5),td:nth-child(5),th:nth-child(6),td:nth-child(6){display:table-cell}li{display:inline-block}}@media only screen and (min-width:43em){th:nth-child(7),td:nth-child(7){display:table-cell}}@media only screen and (min-width:60em){article,footer,header{font-size:1.25em}}
+--></style>
+</head>
+<header>
+  <h3><a href="index.html">The&nbsp;<small>Array&nbsp;Language</small><br>Benchmarks&nbsp;Game</a></h3>
+</header>
+<article>
+  <h1><q>Fastest</q> contributed programs, grouped by programming language implementation</h1>
+  <div>
+    <p><small>shamelessly borrowed from <a href='https://benchmarksgame-team.pages.debian.net/benchmarksgame/'>The Computer Language Benchmarks Game</a></small>
+
+    <p id="chart-fastest-elapsed"><img src="h.svg" alt="Benchmark program elapsed seconds compared to the fastest for selected programming language implementations." title="">
+    <p>Note the python times lie in a tight box compared to k-like languages growler and goal. The k-like languages beat python in <a href='https://benchmarksgame-team.pages.debian.net/benchmarksgame/performance/knucleotide.html'>knucleotide</a> but lost out in <a href='https://benchmarksgame-team.pages.debian.net/benchmarksgame/performance/nbody.html'>nbody</a>, I believe because python allows in-place modification of the bodies' properties. Can you make them faster?
+
+    <p>Python and gcc are included in the game as the languages to beat
+
+    <p>Please propose interesting new benchmarks -- maybe more from <a href='https://benchmarksgame-team.pages.debian.net/benchmarksgame/'>The Computer Language Benchmarks Game</a>
+
+    <p>Please contribute more programs for your favourite language
+  </div>
+  <section><table></section>
+</article>
+<footer>
+    <p>Jack Andrews: @effbiae on the  <a href="https://discord.gg/uCNMrN9Hv">APL Farm discord</a>
+    <p><br>&nbsp;
+</footer>
+
+</html>

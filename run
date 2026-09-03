@@ -1,6 +1,10 @@
 #!/usr/bin/python3
 
-# this defines the executable called for each implementation -- make sure these are on your path
+# you need benchexec to run this.  there is a repository for ubuntu mentioned at: 
+#  https://github.com/sosy-lab/benchexec/blob/main/doc/INSTALL.md#debianubuntu
+#
+# the first in each imp.values() defines the executable called for each implementation
+#  alter for your environment or ensure these are you your path
 imp={'gcc':('gcc','c'),'growler':('k','k'),'python3':('python3','py'),'goal':('goal','k')}
 suites='knucleotide nbody'.split()
 rge={'knucleotide':(20,24),'nbody':(18,26)}
