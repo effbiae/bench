@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from plotnine import*;from pandas import *;from subprocess import run;import os
-t=read_csv("o/run.csv")
+t=read_csv("run.csv")
 n=merge(t,t.query('imp=="gcc"').groupby('suite')['walltime'].median(),on='suite')
 n['norm']=n['walltime_x']/n['walltime_y']
 s = n.groupby('imp')['norm'].median().sort_values().index
