@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from plotnine import*;from pandas import *;import subprocess
+from plotnine import*;from pandas import *;from subprocess import run
 t=read_csv("o/run.csv")
 n=merge(t,t.query('imp=="gcc"').groupby('suite')['walltime'].median(),on='suite')
 n['norm']=n['walltime_x']/n['walltime_y']
@@ -29,17 +29,18 @@ for n,x in n.groupby('suite'):
   imp={'gcc':('gcc','c'),'growler':('k','k'),'python3':('python3','py'),'goal':('goal','k')}
   bn=f'{k}.py'if i=='python3'else f'{k}.c' if i=='gcc'else f'{k}.{i}.{imp[i][1]}';
   i=f'https://github.com/effbiae/bench/blob/master/s/{n}/{bn}'
-  gz=len(subprocess.run(f'gzip -c s/{n}/{bn}', shell=True, capture_output=True, text=False, check=True).stdout)
+  gz=len(run(f'gzip -c s/{n}/{bn}', shell=True, capture_output=True, text=False, check=True).stdout)
   t+=f"""<tr>
    <td>{r['norm']:#.3g}
    <td><a href="{i}">{bn}</a>
-   <td>{r['walltime_x']:>6.2f}
-   <td>{round(r['memory']/1e3):>10}
-   <td>{gz}
-   <th>{r['cputime']:>6.2f}
+   <td>{r['walltime_x']:.2f}
+   <td>{r['memory']/1e3:,.0f}
+   <td>{gz:,}
+   <th>{r['cputime']:,.2f}
    </tr>"""
  t+=("<tr>")
 t+=("</table>")
-with open('index.html','w')as f:
+import os;os.path.exists("site")or os.mkdir("site")
+with open('site/index.html','w')as f:
  with open('index.tmpl')as g:
   f.write(g.read().replace('<table>',t))
