@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from plotnine import*;from pandas import *;from subprocess import run
+from plotnine import*;from pandas import *;from subprocess import run;import os
+os.path.exists("site")or os.mkdir("site")
 t=read_csv("o/run.csv")
 n=merge(t,t.query('imp=="gcc"').groupby('suite')['walltime'].median(),on='suite')
 n['norm']=n['walltime_x']/n['walltime_y']
@@ -9,7 +10,7 @@ p=(ggplot(n) + geom_boxplot(aes(x="factor(imp)", y="norm"))
  + labs(title="How many times slower? (quartiles)",
         x="Language Implementation",
         y="Program elapsed seconds%fastest program"))
-p.save('h.svg')
+p.save('site/h.svg')
 h=(merge(n,n.groupby(['suite','imp'])['norm'].median(),on=['suite','imp'])
    .groupby(['suite','imp']).first()
 ).sort_values(by=['suite','norm_y'])
@@ -40,7 +41,6 @@ for n,x in n.groupby('suite'):
    </tr>"""
  t+=("<tr>")
 t+=("</table>")
-import os;os.path.exists("site")or os.mkdir("site")
 with open('site/index.html','w')as f:
  with open('index.tmpl')as g:
   f.write(g.read().replace('<table>',t))
