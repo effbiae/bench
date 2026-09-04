@@ -43,8 +43,6 @@ system ← 1 ⊑¨ bodies
 pxyz ← ⍉ > ⊑¨ system
 vxyz ← ⍉ > 1 ⊑¨ system
 masses ← 2 ⊑¨ system
-bodyi ← ↕≠system
-sh1 ← ⟨3, -≠system⟩
 
 OffsetMomentum ← {𝕊:
   p2 ← - (+˝˘ vxyz ×⎉1 masses) ÷ solar_mass
@@ -57,24 +55,20 @@ Energy ← {𝕊:
   ep - en
 }
 
+diags ← ∾3⥊<⥊=⌜˜↕≠system
 Advance ← { 𝕊 dt:
-  vxyz +´↩ (<˘¯1↓⍉pxyz) { p0 𝕊 i:
-    i1 ← 1+i
-    d ← 𝕨 - i1 ↓˘ pxyz
-    mag ← dt ÷ ×˜⊸× √ +˝ ×˜ d
-    md ← d ×⎉1 mag
-    sh1 ↑ (-+˝˘ md ×⎉1 i1↓masses) ∾˘ (i⊑masses) × md
-  }¨ ¯1↓bodyi
+  d ← -⌜˜˘ pxyz
+  mag ← dt ÷ ×˜⊸× √ +˝ ×˜ d
+  t ← d ×⎉2 masses ×⎉1 mag
+  vxyz -↩ +˝⎉1 0¨⌾(diags/⥊) t
   pxyz +↩ dt×vxyz
 }
-
-Fmt9 ← {•Out'-'¨⌾(('¯'=r)⊸/)r←∾⟜('0'⥊˜0⌈≠-˜10+⊐⟜'.')•Repr(××(⌊0.5⊸+)⌾(1e9⊸×)∘|)𝕩}
 
 · ← {
   n ← •ParseFloat ⋈⁼•args
   OffsetMomentum@
+  Fmt9 ← {•Out'-'⌾⊑⍟('¯'=⊑) ∾⟜('0'⥊˜0⌈≠-˜10+⊐⟜'.') ∾⟜'.'⍟(⊑'.'¬∘∊⊢) •Repr (××(⌊0.5⊸+)⌾(1e9⊸×)∘|) 𝕩}
   Fmt9 Energy@
   Advance∘0.01⍟n @
   Fmt9 Energy@
 }
-
