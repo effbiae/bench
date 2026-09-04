@@ -5,7 +5,7 @@
 #
 # the first in each imp.values() defines the executable called for each implementation
 #  alter for your environment or ensure these are you your path
-imp={'gcc':('gcc','c'),'growler':('k','k'),'python3':('python3','py'),'goal':('goal','k')}
+imp={'gcc':('gcc','c'),'bqn':('bqn','bqn'),'growler':('k','k'),'python3':('python3','py'),'goal':('goal','k')}
 suites='knucleotide nbody'.split()
 rge={'knucleotide':(20,24),'nbody':(18,26)}
 gen={'fasta':(9,26)}
@@ -51,15 +51,16 @@ for k in n:
  inp=f'--input {dep[k]}-{n[k]}'if k in dep else''
  exec_o='--walltimelimit 30s --memlimit 1GB  --cores '+cores
  for i in imp:
-  bn=f'{k}.py'if i=='python3'else k if i=='gcc'else f'{k}.{i}.{imp[i][1]}';
+  bn=f'{k}.py'if i=='python3'else f'{k}.bqn'if i=='bqn' else k if i=='gcc'else f'{k}.{i}.{imp[i][1]}';
   exe=f'{imp[i][0]} ../s/{k}/{bn}' if i!='gcc' else './'+k
+  arg=f'{2**n[k]}' if k=='nbody'else ''
   for _ in range(5):
    syso(f'echo suite={k}>>{o}')
    syso(f'echo imp={i}>>{o}')
-   syso(f'runexec {exec_o} {inp} --output /tmp/f -- {exe} {2**n[k]} 2>/dev/null >>{o}')
+   syso(f'runexec {exec_o} {inp} --output /tmp/f -- {exe} {arg} 2>/dev/null >>{o}')
    syso(f'echo "--">>{o}')
    if 0==_:assert(0==syso(f"bash -c 'diff <(tail +7 /tmp/f) <(tail +7 {k}-{n[k]}-check)'"))
 with open("o/csv.goal",'w') as f:
- p=r'''"../run.csv"print"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read"run.out"'''
+ p=r'''"../run.csv"say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read"run.out"'''
  f.write(p+'\n')
 syso("goal csv.goal")

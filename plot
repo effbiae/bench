@@ -26,8 +26,8 @@ for n,x in n.groupby('suite'):
  b=merge(x,x.groupby('imp')['norm'].median()).groupby('imp').first().sort_values(by='norm')
  for i,r in b.iterrows():
   k=n
-  imp={'gcc':('gcc','c'),'growler':('k','k'),'python3':('python3','py'),'goal':('goal','k')}
-  bn=f'{k}.py'if i=='python3'else f'{k}.c' if i=='gcc'else f'{k}.{i}.{imp[i][1]}';
+  imp={'gcc':('gcc','c'),'bqn':('bqn','bqn'),'growler':('k','k'),'python3':('python3','py'),'goal':('goal','k')}
+  bn=f'{k}.py'if i=='python3'else f'{k}.bqn'if i=='bqn' else f'{k}.c' if i=='gcc'else f'{k}.{i}.{imp[i][1]}';
   i=f'https://github.com/effbiae/bench/blob/master/s/{n}/{bn}'
   gz=len(run(f'gzip -c s/{n}/{bn}', shell=True, capture_output=True, text=False, check=True).stdout)
   t+=f"""<tr>
