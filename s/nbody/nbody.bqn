@@ -1,4 +1,4 @@
-# contributed by dzaima
+# contributed by dzaima Sep 2026
 pi ← 3.14159265358979323
 solar_mass ← 4 × pi × pi
 days_per_year ← 365.24

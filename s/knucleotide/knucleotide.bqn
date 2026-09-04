@@ -1,3 +1,4 @@
+#contributed by dzaima Sep 2026
 inp ← {⟨⟩:•FBytes "/dev/stdin"; •file.MapBytes ⋈⁼𝕩}•args
 lf ← @+10
 
