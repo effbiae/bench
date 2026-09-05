@@ -1,66 +1,49 @@
-#!/usr/bin/python3
+#!/usr/bin/env goal
+/implementations with executable name and file extensions
+imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal.k");bqn:("bqn";"bqn")]
+rge:..[knucleotide:20 24;nbody:18 26] /the ranges for n (size of input/argument to each benchmark)
+gen:..[knucleotide:"fasta"] /what program generates input
+gcco:"-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp"
+corescmd:rq#cat $(find /sys/devices/system/cpu -regex ".*cpu[0-9]+/topology/thread_siblings_list") |sort -n |uniq |cut -d, -f1#
+bash:{say x;run"bash""-c",x}
+say"cores "+cores:","/=-bash corescmd
+system:{?["e"~@x:bash x;(.x)..code;0]};isfile:{~"e"=@x:stat x};isdir:{(~"e"=@x:stat x)and x"dir"}
+rexcmd:{[t;input;output;argv]
+ "runexec --walltimelimit ${t}s --memlimit 1GB  --cores $cores --input $input --output >(tail +7 >$output) -- $argv"}
+rex:{[t;input;output;argv]bash rexcmd[t;input;output;argv]}
 
-# you need benchexec to run this.  there is a repository for ubuntu mentioned at: 
-#  https://github.com/sosy-lab/benchexec/blob/main/doc/INSTALL.md#debianubuntu
-#
-# the first in each imp.values() defines the executable called for each implementation
-#  alter for your environment or ensure these are you your path
-imp={'gcc':('gcc','c'),'bqn':('bqn','bqn'),'growler':('k','k'),'python3':('python3','py'),'goal':('goal','k')}
-suites='knucleotide nbody'.split()
-rge={'knucleotide':(20,24),'nbody':(18,26)}
-gen={'fasta':(9,26)}
-dep={'knucleotide':'fasta'}
-gcc_opts='-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp'
-import subprocess,sys,os,json
-cores=','.join(subprocess.run(
-        'cat $(find /sys/devices/system/cpu -regex ".*cpu[0-9]+/topology/thread_siblings_list") |sort -n |uniq |cut -d, -f1',
-        shell=True, capture_output=True, text=True, check=True).stdout.split())
-exec_opts='--walltimelimit 5s --memlimit 1GB  --cores '+cores
-def system(x):print(x);return os.system(x)>>8
-def syso(x):return system('cd o;'+x)
-if not os.path.exists('o'):os.mkdir('o')
-for x in dep:
- j=dep[x]
- if not os.path.exists(f'o/{j}'):syso(f'gcc {gcc_opts} ../s/{j}/{j}.c -o{j}')
-for g in rge:
- r=rge[g]
- system(f'gcc {gcc_opts} s/{g}/{g}.c -oo/{g}')
- for i in range(*r):
-  check=f'{g}-{i}-check';inp=''
-  if g in dep:
-   gi=f'{dep[g]}-{i}'
-   inp=f'--input {gi}'
-   if not os.path.exists(f'o/{gi}'):syso(f'timeout 1 ./{dep[g]} {2**i}>{gi}')
-  if not os.path.exists(f'o/{check}'):
-   syso(f'runexec {exec_opts} --output {check} {inp} -- ./{g} {2**i}')
-#run python reference to find n for each test
-if not os.path.exists('o/n'):
- n={}
- for s in suites:
-  g=rge[s]
-  for i in range(*g):
-   inp=f'--input {dep[s]}-{i}'if s in dep else''
-   r=syso(f'runexec {exec_opts} {inp} --output /tmp/f -- python3 ../s/{s}/{s}.py {2**i}|grep returnvalue=0\\$')
-   if 0==r:assert(0==system(f"bash -c 'diff <(tail +7 /tmp/f) <(tail +7 o/{s}-{i}-check)'"))
-   else:n[s]=i-1;break
- with open('o/n','w') as f:json.dump(n,f)
-with open('o/n') as f:n=json.load(f)
-print(n)
-o=f'run.out';syso(f'rm {o}')
-for k in n:
- inp=f'--input {dep[k]}-{n[k]}'if k in dep else''
- exec_o='--walltimelimit 30s --memlimit 1GB  --cores '+cores
- for i in imp:
-  bn=f'{k}.py'if i=='python3'else f'{k}.bqn'if i=='bqn' else k if i=='gcc'else f'{k}.{i}.{imp[i][1]}';
-  exe=f'{imp[i][0]} ../s/{k}/{bn}' if i!='gcc' else './'+k
-  arg=f'{2**n[k]}' if k=='nbody'else ''
-  for _ in range(5):
-   syso(f'echo suite={k}>>{o}')
-   syso(f'echo imp={i}>>{o}')
-   syso(f'runexec {exec_o} {inp} --output /tmp/f -- {exe} {arg} 2>/dev/null >>{o}')
-   syso(f'echo "--">>{o}')
-   if 0==_:assert(0==syso(f"bash -c 'diff <(tail +7 /tmp/f) <(tail +7 {k}-{n[k]}-check)'"))
-with open("o/csv.goal",'w') as f:
- p=r'''"../run.csv"say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read"run.out"'''
- f.write(p+'\n')
-syso("goal csv.goal")
+"imp.json"say""json imp /write imp for use in plot
+
+?[isdir"o";::;mkdir"o"]
+{(isfile"o/$x")or system"gcc $gcco s/$x/${x}.c -oo/$x"}'.gen /compile gcc programs
+
+/generate input for benchmarks that need it
+rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
+
+{[s;r]isfile["o/$s"]or system"gcc $gcco s/$s/${s}.c -oo/$s"
+ {[s|i]n:$*/i#2;check:"$s-$i-check";inp:"/dev/null"
+  ?[s in !gen;(gi:gen[s]+"-$i";inp:"o/$gi";(isfile ogi:"o/$gi")or rex[5;"/dev/null";ogi;"o/"+gen[s]+" $n"]);::]
+  (isfile"o/$check")or rex[5;inp;"o/$check";"o/$s $n"]}'rg r}.'+(!;.)@`rge
+
+/run the python benchmarks with increasing n until python takes longer than 5s (writes json to o/n)
+d:(0#"")!!0
+?[isfile"o/n";:
+ [{[s;r]{[s|;x]n:*/x#2;inp:?[s in !gen;"o/"+gen[s]+"-$x";"/dev/null"];t:tmp 0
+   r:system rexcmd[5;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
+   ?[r=0;[(0=system"diff $t o/$s-$x-check")or 1+"match";rm t];[d[s]:x-1;say d;:r]];rm t;r}/[0=;0;rg r]}.'+(!;.)@`rge
+   "o/n"say""json d]]
+
+say n:"i"$json read "o/n" /read the n for each suite
+
+/here is where the real work happens
+
+o:"o/run.out";u:"w"open"$o"
+{[s;n]
+ {[s;n|i;x]
+  {[s;n;i;x|j]gens:gen s;inp:?[s in !gen;"o/$gens-$n";"/dev/null"]
+   exe:*x;ext:?[i="gcc";"";"."+x 1];bn:"$s$ext";cmd:?[i="gcc";"./o/$s";"$exe s/$s/$bn"];arg:?[s in !gen;"";$*/n#2]
+   u say"suite=$s\nimp=$i";t:tmp 0;u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u
+   ?[(0=j)&"e"~@e:bash"diff $t o/$s-$n-check";[say e;1+"fail"];:];rm t}'!5}.'+(!;.)@`imp}.'+(!;.)@`n
+
+/convert the output to a csv
+"run.csv"say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read o
