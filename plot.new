@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+from plotnine import*;from pandas import *;from subprocess import run;import os,json
+t=read_csv("run.csv")
+#print(t['suite imp walltime'.split()])
+want='suite imp memory cputime walltime_x walltime_y'.split()
+n=merge(t,t.groupby(['suite','imp'])['walltime'].median(),on=['suite','imp'])[want]
+n=merge(n,n.groupby(['suite'])['walltime_y'].min(),on='suite')
+n['norm']=n['walltime_x']/n['walltime_y_y']
+print(n)
+s=n.groupby('imp')['norm'].median().sort_values()
+n['imp'] = Categorical(n['imp'], categories=s.index, ordered=True)
+p=(ggplot(n) + geom_boxplot(aes(x="factor(imp)", y="norm"))
+ + labs(title="How many times slower? (quartiles)",
+        x="Language Implementation",
+        y="Program elapsed seconds%fastest program"))
+p.save('h.svg')
+t='''<table>
+     <tr>
+        <th>&#215;
+        <th>source
+        <th>secs
+        <th>mem
+        <th>gz
+        <th>cpu secs
+      <tr>'''
+imp=json.load(open("imp.json"))
+for n,x in n.groupby('suite'):
+ b=merge(x,x.groupby('imp')['norm'].median()).groupby('imp').first().sort_values(by='norm')
+ for i,r in b.iterrows():
+  k=n
+  bn=f'{k}.{imp[i][1]}'
+  i=f'https://github.com/effbiae/bench/blob/master/s/{n}/{bn}'
+  gz=len(run(f'gzip -c s/{n}/{bn}', shell=True, capture_output=True, text=False, check=True).stdout)
+  t+=f"""<tr>
+   <td>{r['norm']:#.3g}
+   <td><a href="{i}">{bn}</a>
+   <td>{r['walltime_x']:.2f}
+   <td>{r['memory']/1e3:,.0f}
+   <td>{gz:,}
+   <th>{r['cputime']:,.2f}
+   </tr>"""
+ t+=("<tr>")
+t+=("</table>")
+with open('new.html','w')as f:
+ with open('index.tmpl')as g:
+  f.write(g.read().replace('<table>',t))
