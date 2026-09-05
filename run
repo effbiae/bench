@@ -1,6 +1,6 @@
 #!/usr/bin/env goal
 /implementations with executable name and file extensions
-imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal.k");bqn:("bqn";"bqn")]
+imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn")]
 rge:..[knucleotide:20 24;nbody:18 26] /the ranges for n (size of input/argument to each benchmark)
 gen:..[knucleotide:"fasta"] /what program generates input
 gcco:"-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp"
