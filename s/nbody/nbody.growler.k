@@ -45,4 +45,4 @@ energy: {
 report:{`0:{"-0."/"-."\?[x;2#-9+#x:$_0.5+1e9*x;"."]}energy`}
 offset:{p:-+/'BODIES[`v]*\:BODIES[`m];BODIES[`v;;0]:p%BODIES[`m;0]}
 
-{offset`;report`;advance[0.01;x];report`}`I$*x
+{offset`;report`;advance[0.01;x];report`}$[0<n:`I$*x;n;[`0:"specify n on argv";`exit 1]]
