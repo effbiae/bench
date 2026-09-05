@@ -13,7 +13,7 @@ p=(ggplot(n) + geom_boxplot(aes(x="factor(imp)", y="norm"))
  + labs(title="How many times slower? (quartiles)",
         x="Language Implementation",
         y="Program elapsed seconds%fastest program"))
-p.save('h.svg')
+p.save('g.svg')
 t='''<table>
      <tr>
         <th>&#215;
@@ -43,4 +43,4 @@ for n,x in n.groupby('suite'):
 t+=("</table>")
 with open('new.html','w')as f:
  with open('index.tmpl')as g:
-  f.write(g.read().replace('<table>',t))
+  f.write(g.read().replace('<table>',t).replace('h.svg','g.svg'))
