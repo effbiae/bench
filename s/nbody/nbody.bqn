@@ -58,7 +58,7 @@ Energy ← {𝕊:
 diags ← ∾3⥊<⥊=⌜˜↕≠system
 Advance ← { 𝕊 dt:
   d ← -⌜˜˘ pxyz
-  mag ← dt ÷ ×˜⊸× √ +˝ ×˜ d
+  mag ← dt ÷ ×⟜√ +˝ ×˜ d
   t ← d ×⎉2 masses ×⎉1 mag
   vxyz -↩ +˝⎉1 0¨⌾(diags/⥊) t
   pxyz +↩ dt×vxyz
