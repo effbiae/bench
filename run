@@ -7,7 +7,7 @@ gcco:"-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp"
 corescmd:rq#cat $(find /sys/devices/system/cpu -regex ".*cpu[0-9]+/topology/thread_siblings_list") |sort -n |uniq |cut -d, -f1#
 bash:{say x;run"bash""-c",x}
 say"cores "+cores:","/=-bash corescmd
-system:{?["e"~@x:bash x;(.x)..code;0]};isfile:{~"e"=@x:stat x};isdir:{(~"e"=@x:stat x)and x"dir"}
+system:{?["e"~@x:bash x;(.x)..code;0]};isfile:{~"e"=@x:stat x};isdir:{(~"e"=@x:stat x)and x"dir"};assert:{?[~x;"fail"+1;x]}
 rexcmd:{[t;input;output;argv]
  "runexec --walltimelimit ${t}s --memlimit 1GB  --cores $cores --input $input --output >(tail +7 >$output) -- $argv"}
 rex:{[t;input;output;argv]bash rexcmd[t;input;output;argv]}
@@ -30,20 +30,22 @@ d:(0#"")!!0
 ?[isfile"o/n";:
  [{[s;r]{[s|;x]n:*/x#2;inp:?[s in !gen;"o/"+gen[s]+"-$x";"/dev/null"];t:tmp 0
    r:system rexcmd[5;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
-   ?[r=0;[(0=system"diff $t o/$s-$x-check")or 1+"match";rm t];[d[s]:x-1;say d;:r]];rm t;r}/[0=;0;rg r]}.'+(!;.)@`rge
+   ?[r=0;[assert 0=system"diff $t o/$s-$x-check";rm t];[d[s]:x-1;say d;:r]];rm t;r}/[0=;0;rg r]}.'+(!;.)@`rge
    "o/n"say""json d]]
 
 say n:"i"$json read "o/n" /read the n for each suite
 
 /here is where the real work happens
-
-o:"o/run.out";u:"w"open"$o"
-{[s;n]
- {[s;n|i;x]
-  {[s;n;i;x|j]gens:gen s;inp:?[s in !gen;"o/$gens-$n";"/dev/null"]
-   exe:*x;ext:?[i="gcc";"";"."+x 1];bn:"$s$ext";cmd:?[i="gcc";"./o/$s";"$exe s/$s/$bn"];arg:?[s in !gen;"";$*/n#2]
-   u say"suite=$s\nimp=$i";t:tmp 0;u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u
-   ?[(0=j)&"e"~@e:bash"diff $t o/$s-$n-check";[say e;1+"fail"];:];rm t}'!5}.'+(!;.)@`imp}.'+(!;.)@`n
+t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in !gen;"o/$gens-$n";"/dev/null"]
+   exe:*x;ext:?[i="gcc";"";"."+x 1];bn:"$s$ext";cmd:?[i="gcc";"./o/$s";?[f;"$exe $f";"$exe s/$s/$bn"]];arg:?[s in !gen;"";$*/n#2]
+   u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
+/eg run1[suite;imp;file]
+run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=system"diff $a $b";rm'a,b}
+?[ARGS 1;run1 . 1_ARGS;[
+ o:"o/run.out";u:"w"open"$o"
+ {[s;n]
+  {[s;n|i;x]
+   {[s;n;i;x|j]t:tmp 0;t30[u;t;s;n;i;x;""];assert(~0=j)|~"e"~@e:bash"diff $t o/$s-$n-check";rm t}'!5}.'+(!;.)@`imp}.'+(!;.)@`n]]
 
 /convert the output to a csv
 "run.csv"say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read o
