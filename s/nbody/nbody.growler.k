@@ -1,4 +1,5 @@
 #!/usr/bin/env k
+/contributed by ngn Sep 2026
 solarmass:4*/2#3.14159265358979323;daysperyear:365.24;dt:0.01
 /    sun  jupiter                 saturn                  uranus                  neptune
 p:,/(0  4.841431442464721       8.34336671824458       12.894369562139131      15.379697114850915
