@@ -39,9 +39,9 @@ say n:"i"$json read "o/n" /read the n for each suite
 t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in !gen;"o/$gens-$n";"/dev/null"]
    exe:*x;ext:?[i="gcc";"";"."+x 1];bn:"$s$ext";cmd:?[i="gcc";"./o/$s";?[f;"$exe $f";"$exe s/$s/$bn"]];arg:?[s in !gen;"";$*/n#2]
    u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
-/eg run1[suite;imp;file]
+/eg run1[suite;imp;file] ./run knucleotide goal knucleotide.goal 
 run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=system"diff $a $b";rm'a,b}
-?[ARGS 1;run1 . 1_ARGS;[
+?[ARGS 1;run1 . \1_ARGS;[
  o:"o/run.out";u:"w"open"$o"
  {[s;n]
   {[s;n|i;x]

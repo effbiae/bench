@@ -5,18 +5,24 @@
 # modified by Sokolov Yura
 # modified by bearophile
 # 2to3
+# then modified to remove hashing in non-overlapping cases (no rules)
 
 from sys import stdin
 
 def gen_freq(seq, frame, frequences):
     ns = len(seq) + 1 - frame
-    frequences.clear()
-    for ii in range(ns):
-        nucleo = seq[ii:ii + frame]
-        if nucleo in frequences:
-            frequences[nucleo] += 1
-        else:
-            frequences[nucleo] = 1
+    if frame == 1:
+        for s in ["A","C","G","T"]:
+            frequences[s] = seq.count(s)
+    else:
+        # overlapping is possible, so using count is not possible.
+        frequences.clear()
+        for ii in range(ns):
+            nucleo = seq[ii:ii + frame]
+            if nucleo in frequences:
+                frequences[nucleo] += 1
+            else:
+                frequences[nucleo] = 1
     return ns, frequences
 
 
@@ -27,12 +33,6 @@ def sort_seq(seq, length, frequences):
 
     print('\n'.join("%s %.3f" % (st, 100.0*fr/n) for st,fr in l))
     print()
-
-
-def find_seq(seq, s, frequences):
-    n,t = gen_freq(seq, len(s), frequences)
-    print("%d\t%s" % (t.get(s, 0), s))
-
 
 def main():
     frequences = {}
@@ -51,6 +51,6 @@ def main():
         sort_seq(sequence, nl, frequences)
 
     for se in "GGT GGTA GGTATT GGTATTTTAATT GGTATTTTAATTTATAGT".split():
-        find_seq(sequence, se, frequences)
+        print("%d\t%s" % (sequence.count(se), se))
 
 main()
