@@ -21,8 +21,8 @@ Ni:*|+.q.cross[!3;!c]
 adv:{p+:v+:+/(m[mi]*a,-a:d%(N*sqrt N:+/(d*d:-/p pk)di)Ni)Fi}
 
 report:{E:(1%dt*dt*dt*dt)*(0.5*+/m*+/(3;n)#v*v)-+/(*/m jk)%sqrt@+/d*d:-/((3;n)#p)@\:/:jk
-        1 .Q.f[9]E;}
+        -1 .Q.f[9]E;}
 /`expecting,-0.169075164 -0.169086185
 v[n*!3]:((-+/m*)'(3;n)#v)%*m /offset
-report`;-1"";("I"$*.z.x,,$_1e6)adv/`;report`
+report`;("I"$*.z.x,,$_1e6)adv/`;report`
 \\

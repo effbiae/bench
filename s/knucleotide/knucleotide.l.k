@@ -5,3 +5,4 @@ f:{d:#:'=p:y;k:!d;v:. d;v:100*v%#p
 1 2 f'(d;8/:(-1_d;1_d));
 s:" "\:"GGT GGTA GGTATT GGTATTTTAATT GGTATTTTAATTTATAGT"
 -1@"\t"/:'+(($+/'&\((!#*|s)_/:'(4h$0 1 2 3=\:d),\:/:4h$(&,:)'!#*|s)@'"GTAC"?*|s)@-1+#:'s;s);
+\\

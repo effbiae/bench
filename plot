@@ -36,7 +36,7 @@ for n,x in n.groupby('suite'):
    <td>{r['walltime_x']:.2f}
    <td>{r['memory']/1e3:,.0f}
    <td>{gz:,}
-   <th>{r['cputime']:,.2f}
+   <td>{r['cputime']:,.2f}
    </tr>"""
  t+=("<tr>")
 t+=("</table>")
