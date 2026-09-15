@@ -36,9 +36,9 @@ d:(0#"")!!0
 say n:"i"$json read "o/n" /read the n for each suite
 
 /here is where the real work happens
-t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in !gen;"o/$gens-$n";"/dev/null"]
-   exe:*x;ext:?[i="gcc";"";"."+x 1];bn:"$s$ext";cmd:?[i="gcc";"./o/$s";?[f;"$exe $f";"$exe s/$s/$bn"]];arg:?[s in !gen;"";$*/n#2]
-   u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
+t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
+   exe:*x;ext:?[i="gcc";"";"."+x 1];bn:"$s$ext";cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];?[f;"$exe $f";"$exe s/$s/$bn"]]
+   arg:?[s in !gen;"";$*/n#2];u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
 /eg run1[suite;imp;file] ./run knucleotide goal knucleotide.goal 
 run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=system"diff $a $b";rm'a,b}
 ?[ARGS 1;run1 . 1_ARGS;[
