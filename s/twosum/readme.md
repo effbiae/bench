@@ -35,7 +35,7 @@ generate the random numbers mod n for n
  rn=[cbrng(x,n)%n for x in range(n)]
 ```
 
-cut the random list, with l/(l+1) fraction of items in a and h the remainder
+cut the random list, with `l/(l+1)` fraction of items in `a` and `h` the remainder
 ```
  m=math.floor(n*l/(l+1))
  a,h=rn[0:m],rn[m:]
