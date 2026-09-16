@@ -4,9 +4,13 @@ find existence of pair sums in a list
 eg is there a pair that sums to 5 in [0,1,2,3]? yes, 2+3=5
 
 the problem is to find existence count of sums so given
+
  `a=[4,5,6]` and `h=[0,1,2,3]`
+
 the result is 2 because there are two elements in `a` equal to pair sums from `h`
+
  (4=1+3, 5=2+3). there is no pair in `h` that sums to 6
+
 the output is `2/len(a)` or 0.66666666667
 
 
