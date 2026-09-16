@@ -42,7 +42,7 @@ cut the random list, with `l/(l+1)` fraction of items in `a` and `h` the remaind
 ```
 `a` contains needles, `h` is the haystack
 
-for each needle in a, count the times when there are two items in h where h1+h2==a
+for each needle in `a`, count the times when there are two items in `h` where `h1+h2==a`
 ```
  d=set(h);i=0
  for x in a:
