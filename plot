@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 from plotnine import*;from pandas import *;from subprocess import run;import os,json
 t=read_csv("run.csv")
-n=merge(t,t.query('imp=="gcc"').groupby('suite')['walltime'].median(),on='suite')
-n['norm']=n['walltime_x']/n['walltime_y']
-s = n.groupby('imp')['norm'].median().sort_values().index
-n['imp'] = Categorical(n['imp'], categories=s, ordered=True)
+#print(t['suite imp walltime'.split()])
+want='suite imp memory cputime walltime_x walltime_y'.split()
+n=merge(t,t.groupby(['suite','imp'])['walltime'].median(),on=['suite','imp'])[want]
+n=merge(n,n.groupby(['suite'])['walltime_y'].min(),on='suite')
+n['norm']=n['walltime_x']/n['walltime_y_y']
+print(n)
+s=n.groupby('imp')['norm'].median().sort_values()
+n['imp'] = Categorical(n['imp'], categories=s.index, ordered=True)
 p=(ggplot(n) + geom_boxplot(aes(x="factor(imp)", y="norm"))
  + labs(title="How many times slower? (quartiles)",
         x="Language Implementation",
         y="Program elapsed seconds%fastest program"))
 p.save('h.svg')
-h=(merge(n,n.groupby(['suite','imp'])['norm'].median(),on=['suite','imp'])
-   .groupby(['suite','imp']).first()
-).sort_values(by=['suite','norm_y'])
 t='''<table>
      <tr>
         <th>&#215;
@@ -27,7 +28,8 @@ for n,x in n.groupby('suite'):
  b=merge(x,x.groupby('imp')['norm'].median()).groupby('imp').first().sort_values(by='norm')
  for i,r in b.iterrows():
   k=n
-  bn=f'{k}.{imp[i][1]}'
+  impi1=imp[i][1]if type(imp[i][1])is list else [imp[i][1]]
+  bn=[f'{k}.{x}'for x in impi1 if os.path.exists(f's/{n}/{n}.{x}')][0]
   i=f'https://github.com/effbiae/bench/blob/master/s/{n}/{bn}'
   gz=len(run(f'gzip -c s/{n}/{bn}', shell=True, capture_output=True, text=False, check=True).stdout)
   t+=f"""<tr>
