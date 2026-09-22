@@ -8,4 +8,4 @@ fact=lambda x:prod(0,x)
 f =lambda x:fact(fact(x)+x)/fact(fact(x)) #(x!+x)!/x!!
 fO=lambda x:prod(fact(x),x) #optimised f
 a=5;assert(fO(a)==f(a))
-print(str(fO(int((sys.argv+["512"])[1])))[:9])
+print(str(fO(int((sys.argv+["512"])[1])))[:80])
