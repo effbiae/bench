@@ -1,8 +1,8 @@
-d:+/1_=(x?">TH")_x:-read STDIN
+d:+/1_=(x?">TH")_x:-read"/dev/stdin"
 dk:&db!¿dc:%db:"b"$d
 f:{e:{>(&x!¿c)!=c:?[p.x~1;x;%x]}p:4/x^dc
  k:!e; v:"i"$round 1e5*(.e)%#p
  "\n"/{"$x "+"."/(0,-3+&y)_y:$y}'[+/""\uc"b"$dk@´4\k;v]}
 s:!_"GGT GGTA GGTATT GGTATTTTAATT GGTATTTTAATTTATAGT"
 g:"\n"/{($x#d)+uc"\t$x"}':
-say"\n\n"/,/(f'1 2;g s)
+say"\n\n"/,/rt.go(f;f;g)!(1;2;s)
