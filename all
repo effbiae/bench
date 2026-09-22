@@ -1,7 +1,3 @@
 #!/bin/bash
-rm -r o
-./run old
-./plot r1
-rm -r o
-./run
-./plot index
+rm -r o;./run old;./plot r1
+rm -r o;./run;./plot index
