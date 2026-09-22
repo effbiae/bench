@@ -44,11 +44,11 @@ t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gc
    arg:?[s in !gen;"";$*/n#2];u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
 /eg run1[suite;imp;file] ./run knucleotide goal knucleotide.goal 
 run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=system"diff $a $b";rm'a,b}
-?["-1"in ARGS;run1 . 2_ARGS;[
+?["-1"in ARGS;run1 . (1+ARGS?"-1")_ARGS;[
  o:"o/run.out";u:"w"open"$o"
  {[s;n]
   {[s;n|i;x]?[bn:src[s;x];:;:1];?[i="gcc";(isfile"o/$s")or system"gcc $gcco $bn -oo/$s";:] /compile c program
    {[s;n;i;x|j]t:tmp 0;t30[u;t;s;n;i;x;""];assert(~0=j)|~"e"~@e:bash"diff $t o/$s-$n-check";rm t}'!5}.'+(!;.)@`imp}.'+(!;.)@`n]]
 
 /convert the output to a csv
-"index.csv"say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read o
+?["old"in ARGS;"r1.csv";"index.csv"]say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read o
