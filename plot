@@ -36,10 +36,10 @@ for n,x in n.groupby('suite'):
   t+=f"""<tr>
    <td>{r['norm']:#.3g}
    <td><a href="{i}">{bn}</a>
-   <td>{r['walltime_x']:.2f}
+   <td>{r['walltime_x']:.3g}
    <td>{r['memory']/1e3:,.0f}
    <td>{gz:,}
-   <td>{r['cputime']:,.2f}
+   <td>{r['cputime']:,.3g}
    </tr>"""
  t+=("<tr>")
 t+=("</table>")
