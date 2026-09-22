@@ -1,7 +1,10 @@
 #!/usr/bin/env goal
 /implementations with executable name and file extensions
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn");l:("l_l64";"l.k""l.q");amber:("amber";"amber.k")]
-rge:..[knucleotide:20 24;nbody:18 26] /the ranges for n (size of input/argument to each benchmark)
+rge:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;bigfact:7 11] /the ranges for n (size of input/argument to each benchmark)
+wk:"spectralnorm""bigfact"
+?[~|/"old""all"in ARGS;rge:wk#rge;?["old"in ARGS;rge:wk^rge;:]]
+say rge
 gen:..[knucleotide:"fasta"] /what program generates input
 gcco:"-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp"
 corescmd:rq#cat $(find /sys/devices/system/cpu -regex ".*cpu[0-9]+/topology/thread_siblings_list") |sort -n |uniq |cut -d, -f1#
@@ -19,33 +22,33 @@ rex:{[t;input;output;argv]bash rexcmd[t;input;output;argv]}
 
 /generate input for benchmarks that need it
 rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
-
-{[s;r]isfile["o/$s"]or system"gcc $gcco s/$s/${s}.c -oo/$s"
- {[s|i]n:$*/i#2;check:"$s-$i-check";inp:"/dev/null"
-  ?[s in !gen;(gi:gen[s]+"-$i";inp:"o/$gi";(isfile ogi:"o/$gi")or rex[5;"/dev/null";ogi;"o/"+gen[s]+" $n"]);::]
-  (isfile"o/$check")or rex[5;inp;"o/$check";"o/$s $n"]}'rg r}.'+(!;.)@`rge
+{[s;r]
+ {[s|i]n:$*/i#2;inp:"/dev/null"
+  ?[s in !gen;[gi:gen[s]+"-$i";inp:"o/$gi";(isfile ogi:"o/$gi")or rex[5;"/dev/null";ogi;"o/"+gen[s]+" $n"]];::]
+  }'rg r}.'+(!;.)@`rge
 
 /run the python benchmarks with increasing n until python takes longer than 5s (writes json to o/n)
 d:(0#"")!!0
 ?[isfile"o/n";:
- [{[s;r]{[s|;x]n:*/x#2;inp:?[s in !gen;"o/"+gen[s]+"-$x";"/dev/null"];t:tmp 0
+ [{[s;r]{[s|;x]n:*/x#2;inp:?[s in !gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
    r:system rexcmd[5;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
-   ?[r=0;[assert 0=system"diff $t o/$s-$x-check";rm t];[d[s]:x-1;say d;:r]];rm t;r}/[0=;0;rg r]}.'+(!;.)@`rge
+   ?[r=0;:;[d[s]:x-1;say d;:r]];r}/[0=;0;rg r]}.'+(!;.)@`rge
    "o/n"say""json d]]
 
 say n:"i"$json read "o/n" /read the n for each suite
 
 /here is where the real work happens
+src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1}
 t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
-   exe:*x;ext:?[i="gcc";"";"."+x 1];bn:*{isfile'x}#"s/$s/$s"+ext;cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];?[f;"$exe $f";"$exe $bn"]]
+   exe:*x;bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];?[f;"$exe $f";"$exe $bn"]]
    arg:?[s in !gen;"";$*/n#2];u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
 /eg run1[suite;imp;file] ./run knucleotide goal knucleotide.goal 
 run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=system"diff $a $b";rm'a,b}
-?[ARGS 1;run1 . 1_ARGS;[
+?["-1"in ARGS;run1 . 2_ARGS;[
  o:"o/run.out";u:"w"open"$o"
  {[s;n]
-  {[s;n|i;x]
+  {[s;n|i;x]?[bn:src[s;x];:;:1];?[i="gcc";(isfile"o/$s")or system"gcc $gcco $bn -oo/$s";:] /compile c program
    {[s;n;i;x|j]t:tmp 0;t30[u;t;s;n;i;x;""];assert(~0=j)|~"e"~@e:bash"diff $t o/$s-$n-check";rm t}'!5}.'+(!;.)@`imp}.'+(!;.)@`n]]
 
 /convert the output to a csv
-"run.csv"say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read o
+"index.csv"say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read o
