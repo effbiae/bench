@@ -1,7 +1,7 @@
 #!/usr/bin/env goal
 /implementations with executable name and file extensions
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn");l:("l_l64";"l.k""l.q");amber:("amber";"amber.k")]
-rge:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;collatz:13 14] /the ranges for n (size of input/argument to each benchmark) /;bigfact:7 11
+rge:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;collatz:16 17] /the ranges for n (size of input/argument to each benchmark) /;bigfact:7 11
 rnd:"collatz""spectralnorm"
 ?[~|/"r1""all"in ARGS;rge:rnd#rge;?["r1"in ARGS;rge:rnd^rge;:]]
 say rge
