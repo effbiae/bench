@@ -1,4 +1,4 @@
-#find longest collatz sequence for a range of integers
+#find length of collatz sequence starting at 1+2^x
 import math,sys
 def collatz(x):
  i=0
