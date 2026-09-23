@@ -2,8 +2,8 @@
 /implementations with executable name and file extensions
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn");l:("l_l64";"l.k""l.q");amber:("amber";"amber.k")]
 rge:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;bigfact:7 11] /the ranges for n (size of input/argument to each benchmark)
-wk:"spectralnorm""bigfact"
-?[~|/"old""all"in ARGS;rge:wk#rge;?["old"in ARGS;rge:wk^rge;:]]
+rnd:"spectralnorm""bigfact"
+?[~|/"r1""all"in ARGS;rge:rnd#rge;?["r1"in ARGS;rge:rnd^rge;:]]
 say rge
 gen:..[knucleotide:"fasta"] /what program generates input
 gcco:"-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp"
@@ -51,4 +51,4 @@ run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];ass
    {[s;n;i;x|j]t:tmp 0;t30[u;t;s;n;i;x;""];assert(~0=j)|~"e"~@e:bash"diff $t o/$s-$n-check";rm t}'!5}.'+(!;.)@`imp}.'+(!;.)@`n]]
 
 /convert the output to a csv
-?["old"in ARGS;"r1.csv";"index.csv"]say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read o
+?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\read o
