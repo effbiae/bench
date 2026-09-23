@@ -1,5 +1,5 @@
-#!/usr/bin/env k
-/contributed by ngn Sep 2026
+#!/usr/bin/env amber
+/Amber entry Sep 2026
 solarmass:4*/2#3.14159265358979323;daysperyear:365.24;dt:0.01
 /    sun  jupiter                 saturn                  uranus                  neptune
 p:,/(0  4.841431442464721       8.34336671824458       12.894369562139131      15.379697114850915
@@ -10,16 +10,16 @@ v:,/(0  0.0016600766427440367  -0.002767425107268624    0.002964601375647616    
      0 -6.90460016972063e-5     2.3041729757376393e-5  -2.9658956854023756e-5  -9.515922545197159e-5)*daysperyear*dt
 m:   1  9.54791938424326609e-04 2.85885980666130812e-04 4.36624404335156298e-05 5.15138902046611451e-05*solarmass*dt*dt
 
-c:#*ij:&~|\=n:#m
-pi:{n/!(!3;x)}'ij
-mi:,/{3}#ij
-Fi:+,/(c*!3)+\:(3*c)/'&'(!n)=\:|ij
-di:{x#!*/x}3,c
-Ni:*|!3,c
-adv:{p+:v+:+/(m[mi]*a,-a:d%(N*%N:+/(d*d:-/p pi)di)Ni)Fi}
+(I;J):&~|\=n:#m
+P0:,/I+/:0 5 10;P1:,/J+/:0 5 10
+D0:!10;D1:10+D0;D2:20+D0;Ni:10!!30;V0:!5;V1:5+V0;V2:10+V0
+Mf:(-m J,J,J),m I,I,I
+ks:{(&I=x),30+&J=x}'!n;(F0;F1;F2;F3):+,/ks+/:0 10 20
+adv:{[z]d:(p P0)-p P1;dd:d*d;N:(dd D0)+(dd D1)+dd D2;fv:(a,a:d%(N*%N)Ni)*Mf;v+:(fv F0)+(fv F1)+(fv F2)+fv F3;p+:v}
 
-report:{E:(1%dt*dt*dt*dt)*(0.5*+/m*+/(3;n)#v*v)-+/(*/m ij)%%+/d*d:-/((3;n)#p)@\:/:ij
-        `0:{"-0."/"-."\?[x;2#-9+#x:$_0.5+1e9*x;"."]}E}
-/`expecting,-0.169075164 -0.169086185
-v[n*!3]:((-+/m*)'(3;n)#v)%*m /offset
-report`;(`I$*x,,$_1e6)adv/`;report`
+report:{d:(p P0)-p P1;dd:d*d;vv:v*v
+        E:(1%dt*dt*dt*dt)*(0.5*+/m*(vv V0)+(vv V1)+vv V2)-+/(m[I]*m J)%%(dd D0)+(dd D1)+dd D2
+        r:$_0.5+1e9*E;`0:"-0."/"-."\(-9_r),".",-9#r}
+/`expecting,-0.169075164 -0.169039630 (n=1048576)
+v[0 5 10]:(-{+/m*x}'(v V0;v V1;v V2))%*m /offset
+report 0;(. `argv 2)adv/0;report 0
