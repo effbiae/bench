@@ -1,8 +1,8 @@
 #!/usr/bin/env goal
 /implementations with executable name and file extensions
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn");l:("l_l64";"l.k""l.q");amber:("amber";"amber.k")]
-rge:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;collatz:7 12;bigfact:7 11] /the ranges for n (size of input/argument to each benchmark)
-rnd:"spectralnorm""collatz""bigfact"
+rge:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;collatz:13 14] /the ranges for n (size of input/argument to each benchmark) /;bigfact:7 11
+rnd:"collatz""spectralnorm"
 ?[~|/"r1""all"in ARGS;rge:rnd#rge;?["r1"in ARGS;rge:rnd^rge;:]]
 say rge
 gen:..[knucleotide:"fasta"] /what program generates input
@@ -30,9 +30,9 @@ rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
 /run the python benchmarks with increasing n until python takes longer than 5s (writes json to o/n)
 d:(0#"")!!0
 ?[isfile"o/n";:
- [{[s;r]{[s|;x]n:*/x#2;inp:?[s in !gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
+ [{[s;r]{[s|;x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
    r:system rexcmd[5;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
-   ?[r=0;:;[d[s]:x-1;say d;:r]];r}/[0=;0;rg r]}.'+(!;.)@`rge
+   ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]}.'+(!;.)@`^rge
    "o/n"say""json d]]
 
 say n:"i"$json read "o/n" /read the n for each suite
