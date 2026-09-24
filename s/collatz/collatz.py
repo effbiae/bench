@@ -2,10 +2,11 @@
 import math,sys
 def collatz(x):
  i=0
- while x!=1:
-  if x%2==0:x//= 2
-  else:x=3*x+1
-  i+=1
+ while x != 1:
+    x += x << 1 | 1
+    k = (x&-x).bit_length()
+    x >>= k - 1
+    i += k
  return i
 x=int((sys.argv+["10000"])[1])
 s=1+2**x
