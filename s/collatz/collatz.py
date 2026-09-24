@@ -1,4 +1,5 @@
 #find length of collatz sequence starting at 1+2^x
+#the loop was optimized by Fiuzeri
 import math,sys
 def collatz(x):
  i=0
