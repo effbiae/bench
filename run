@@ -1,6 +1,8 @@
 #!/usr/bin/env goal
 /implementations with executable name and file extensions
-imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn");l:("l_l64";"l.k""l.q");amber:("amber";"amber.k")]
+imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn")
+       l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap")]
+cal:{" "/x,y};call:(!imp)!cal@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")}
 rge:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;collatz:16 17] /the ranges for n (size of input/argument to each benchmark) /;bigfact:7 11
 rnd:"collatz""spectralnorm"
 ?[~|/"r1""all"in ARGS;rge:rnd#rge;?["r1"in ARGS;rge:rnd^rge;:]]
@@ -40,8 +42,8 @@ say n:"i"$json read "o/n" /read the n for each suite
 /here is where the real work happens
 src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1}
 t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
-   exe:*x;bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];?[f;"$exe $f";"$exe $bn"]]
-   arg:?[s in !gen;"";$*/n#2];u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
+   exe:*x;bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];call[i]@?[f;f;bn]]
+   arg:?[s in!gen;"";$*/n#2];u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
 /eg run1[suite;imp;file] ./run knucleotide goal knucleotide.goal 
 run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=system"diff $a $b";rm'a,b}
 ?["-1"in ARGS;run1 . (1+ARGS?"-1")_ARGS;[
