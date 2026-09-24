@@ -1,0 +1,11 @@
+coll ⇐ {
+	steps ← 0
+	n ← ⍵
+	while (n≠1) {
+		n ← if (0=2|n) { n÷2 } else { 1+n×3 }
+		steps +← 1
+	}
+	steps
+}
+
+io:println coll 1+2*⍎↑⎕argv
