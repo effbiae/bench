@@ -1,7 +1,7 @@
 #!/usr/bin/env goal
 /implementations with executable name and file extensions
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn")
-       l:("l_l64";"l.k""l.q");amber:("amber";"amber.k")] /;kap:("kap-jvm-text";"kap")]
+       l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap")]
 call:(!imp)!(" "/,)@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")}
 rge:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;collatz:16 17] /the ranges for n (size of input/argument to each benchmark) /;bigfact:7 11
 rnd:"collatz""spectralnorm"
@@ -40,17 +40,17 @@ d:(0#"")!!0
 say n:(!rge)#"i"$json read "o/n" /read the n for each suite
 
 /here is where the real work happens
-src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1};dif:{[f;s;n]"diff $f o/$s-$n-check"};tim:{?["e"~@x:stat[x];0;x"mtime"]}
+src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1};dif:{[f;s;n]system"diff $f o/$s-$n-check"};tim:{?["e"~@x:stat[x];0;x"mtime"]}
 t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
-   exe:*x;bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];call[i]@?[f;f;bn]]
+   bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];call[i]@?[f;f;bn]]
    arg:?[s in!gen;"";$*/n#2];u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
 /eg run1[suite;imp;file] ./run knucleotide goal knucleotide.goal
-run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=system dif[b;s;n s];rm'a,b}
+run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=dif[b;s;n s];rm'a,b}
 ?["-1"in ARGS;run1 . (1+ARGS?"-1")_ARGS;[l:()
  {[s;n]
   {[s;n|i;x]?[bn:src[s;x];:;:1];?[tim[v:*|l,:"o/$s-$n-$i-run"]<tim bn;:;:1];w:"w"open tw:tmp"";
             ?[i="gcc";(tim["o/$s"]<tim bn)and system"gcc $gcco $bn -oo/$s";:] /compile c program
-   {[s;n;i;x;w|j]t:tmp 0;t30[w;t;s;n;i;x;""];assert 0=system dif[t;s;n];rm t}'!5;close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
+   {[s;n;i;x;w|j]t:tmp 0;t30[w;t;s;n;i;x;""];assert 0=dif[t;s;n];rm t}'!5;close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
  /convert the output to a csv
  ?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\""/read'l
 ]]
