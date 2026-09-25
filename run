@@ -24,18 +24,16 @@ rex:{[t;input;output;argv]bash rexcmd[t;input;output;argv]}
 
 /generate input for benchmarks that need it
 rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
-{[s;r]
- {[s|i]n:$*/i#2;inp:"/dev/null"
-  ?[s in !gen;[gi:gen[s]+"-$i";inp:"o/$gi";(isfile ogi:"o/$gi")or rex[5;"/dev/null";ogi;"o/"+gen[s]+" $n"]];::]
-  }'rg r}.'+(!;.)@`rge
+{[s;r]{[s|i]n:$*/i#2;(s in!gen)and [ogi:"o/"+gen[s]+"-$i";(isfile ogi)or rex[5;"/dev/null";ogi;"o/"+gen[s]+" $n"]]}'rg r}.'+(!;.)@`rge
 
 /run the python benchmarks with increasing n until python takes longer than 5s (writes json to o/n)
-d:(0#"")!!0
-?[isfile"o/n";:
- [{[s;r]{[s|;x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
+d:?[isfile["o/n"];json read"o/n";(0#"")!!0]
+{[s;r]?[s in!d;:
+ {[s|;x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
    r:system rexcmd[5;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
-   ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]}.'+(!;.)@`^rge
-   "o/n"say""json d]]
+   ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]]}.'+(!;.)@`^rge
+
+"o/n"say""json d
 
 say n:(!rge)#"i"$json read "o/n" /read the n for each suite
 
