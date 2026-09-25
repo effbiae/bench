@@ -8,4 +8,4 @@ coll ⇐ {
 	steps
 }
 
-io:println coll 1+2*⍎↑⎕argv
+io:println time:runtime {coll 1+2*⍎↑⎕argv}
