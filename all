@@ -1,3 +1,5 @@
 #!/bin/bash
-rm -r o;./run r1;./plot r1
-rm -r o;./run;./plot index
+for x in r1 index
+do
+ ./run $x;./plot $x
+done
