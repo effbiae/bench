@@ -1,11 +1,11 @@
 #!/usr/bin/env goal
 /implementations with executable name and file extensions
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn")
-       l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap")]
-call:(!imp)!(" "/,)@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")}
-rge:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;collatz:16 17] /the ranges for n (size of input/argument to each benchmark) /;bigfact:7 11
+       l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap");peachq:("q";"peach.q")]
+call:(!imp)!(" "/,)@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")};call["peachq"]:{" "/(*imp["peachq"];x;"-q")}
+all:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;collatz:16 17] /the ranges for n (size of input/argument to each benchmark) /;bigfact:7 11
 rnd:"collatz""spectralnorm"
-?[~"r1"in ARGS;rge:rnd#rge;rge:rnd^rge]
+?[~"r1"in ARGS;rge:rnd#all;rge:rnd^all]
 say rge;
 gen:..[knucleotide:"fasta"] /what program generates input
 gcco:"-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp"
@@ -24,17 +24,18 @@ rex:{[t;input;output;argv]bash rexcmd[t;input;output;argv]}
 
 /generate input for benchmarks that need it
 rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
-{[s;r]{[s|i]n:$*/i#2;(s in!gen)and [ogi:"o/"+gen[s]+"-$i";(isfile ogi)or rex[5;"/dev/null";ogi;"o/"+gen[s]+" $n"]]}'rg r}.'+(!;.)@`rge
+{[s;r]{[s|i]n:$*/i#2;(s in!gen)and [ogi:"o/"+gen[s]+"-$i";(isfile ogi)or rex[5;"/dev/null";ogi;"o/"+gen[s]+" $n"]]}'rg r}.'+(!;.)@`all
 
 /run the python benchmarks with increasing n until python takes longer than 5s (writes json to o/n)
 d:?[isfile["o/n"];"i"$json read"o/n";(0#"")!!0]
-{[s;r]?[s in!d;:
- {[s|;x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
-   r:system rexcmd[5;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
-   ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]]}.'+(!;.)@`^rge
-"o/n"say""json d
+?[~#d
+ [{[s;r]?[s in!d;:
+  {[s|;x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
+    r:system rexcmd[5;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
+    ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]];say s,r}.'+(!;.)@`all;"o/n"say""json d]
+ :]
 
-say n:(!rge)#d /read the n for each suite
+say n:rnd#d /read the n for each suite
 
 /here is where the real work happens
 src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1};dif:{[f;s;n]system"diff $f o/$s-$n-check"};tim:{?["e"~@x:stat[x];0;x"mtime"]}
