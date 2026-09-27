@@ -35,20 +35,20 @@ d:?[isfile["o/n"];"i"$json read"o/n";(0#"")!!0]
     ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]];say s,r}.'+(!;.)@`all;"o/n"say""json d]
  :]
 
-say n:rnd#d /read the n for each suite
+say n:(!rge)#d /the n for this round
 
 /here is where the real work happens
 src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1};dif:{[f;s;n]system"diff $f o/$s-$n-check"};tim:{?["e"~@x:stat[x];0;x"mtime"]}
 t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
-   bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];call[i]@?[f;f;bn]]
-   arg:?[s in!gen;"";$*/n#2];u say"suite=$s\nimp=$i";u print rex[30;inp;t;"$cmd $arg"];u say"--";flush u}
+   w:"terminationreason=walltime\n";bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];call[i]@?[f;f;bn]]
+   arg:?[s in!gen;"";$*/n#2];u say"suite=$s\nimp=$i";u print ""/w\out:rex[30;inp;t;"$cmd $arg"];u say"--";flush u;w in out}
 /eg run1[suite;imp;file] ./run knucleotide goal knucleotide.goal
 run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=dif[b;s;n s];rm'a,b}
 ?["-1"in ARGS;run1 . (1+ARGS?"-1")_ARGS;[l:()
  {[s;n]
   {[s;n|i;x]?[bn:src[s;x];:;:1];?[tim[v:*|l,:"o/$s-$n-$i-run"]<tim bn;:;:1];w:"w"open tw:tmp"";
             ?[i="gcc";(tim["o/$s"]<tim bn)and system"gcc $gcco $bn -oo/$s";:] /compile c program
-   {[s;n;i;x;w|j]t:tmp 0;t30[w;t;s;n;i;x;""];assert 0=dif[t;s;n];rm t}'!5;close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
+   {[s;n;i;x;w|;j]t:tmp 0;r:(0=t30[w;t;s;n;i;x;""])and 0=dif[t;s;n];rm t;r}/[1=;1;!5];close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
  /convert the output to a csv
  ?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\""/read'l
 ]]
