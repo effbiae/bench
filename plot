@@ -29,32 +29,24 @@ imp=json.load(open("imp.json"))
 for n,x in n.groupby('suite'):
  b=merge(x,x.groupby('imp')['norm'].median()).groupby('imp').first().sort_values(by='norm')
  for i,r in b.iterrows():
-  k=n
   impi1=imp[i][1]if type(imp[i][1])is list else [imp[i][1]]
-  bn=[f'{k}.{x}'for x in impi1 if os.path.exists(f's/{n}/{n}.{x}')][0]
+  bn=[f'{n}.{x}'for x in impi1 if os.path.exists(f's/{n}/{n}.{x}')][0]
   h=f'https://github.com/effbiae/bench/blob/master/s/{n}/{bn}'
   gz=len(run(f'gzip -c s/{n}/{bn}', shell=True, capture_output=True, text=False, check=True).stdout)
   a1=a.query('suite==@n and imp==@i').groupby(['suite','imp']).filter(lambda x: len(x)==1)
-  if not len(a1):
-   t+=f"""<tr>
-    <td>{r['norm']:#.3g}
-    <td><a href="{h}">{bn}</a>
-    <td>{r['walltime_x']:.3g}
-    <td>{r['memory']/1e3:,.0f}
-    <td>{gz:,}
-    <td>{r['cputime']:,.3g}
-    </tr>"""
-  else:
-   t+=f"""<tr>
-   <td>x
-   <td><a href="{h}">{bn}</a>
-   <td>timeout
-   <td>{r['memory']/1e3:,.0f}
-   <td>{gz:,}
-   <td>timeout
-   </tr>"""
+  t+='<tr>'+(
+   f"""<td>{r['norm']:#.3g} <td><a href="{h}">{bn}</a> <td>{r['walltime_x']:.3g} <td>{r['memory']/1e3:,.0f}
+       <td>{gz:,}           <td>{r['cputime']:,.3g}"""if not len(a1)else 
+   f"""<td>x                <td><a href="{h}">{bn}</a> <td>timeout               <td>{r['memory']/1e3:,.0f}
+       <td>{gz:,}           <td>timeout""")
  t+=("<tr></tr>")
 t+=("</table>")
+content={'index':'''<p>This is the current round of the benchmarks game.  See <a href=r1.html>Round 1</a> for the last round performance.  It's never too late to add your language to this round or previous rounds or to improve any program from any round.  
+    <p>See description of <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/spectralnorm.html#spectralnorm">spectralnorm</a>. collatz requires the length of the collatz sequence starting at 1+2^x
+    ''','r1':'''    <p>These are the descriptions for <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/nbody.html#nbody">nbody</a> and <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/knucleotide.html#knucleotide>knucleotide</a> benchmarks.
+    <p>Python and gcc are included in the game as the languages to beat.
+    '''}
+
 with open(f'{m}.html','w')as f:
- with open(f'{m}.tmpl')as g:
-  f.write(g.read().replace('<table>',t))
+ with open(f'page.tmpl')as g:
+  f.write(g.read()%{'table':t,'content':content[m],'m':m})
