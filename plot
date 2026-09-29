@@ -14,7 +14,8 @@ f=n.groupby(['suite','imp']).filter(lambda x: len(x)>1)
 p=(ggplot(f) + geom_boxplot(aes(x="factor(imp)", y="norm"))
  + labs(title="How many times slower?",
         x="Language Implementation",
-        y="Program elapsed seconds%fastest program"))
+        y="Program elapsed seconds%fastest program")
+ + scale_y_log10())
 p.save(f'{m}.svg')
 t='''<table>
      <tr>
