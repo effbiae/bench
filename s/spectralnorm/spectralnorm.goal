@@ -1,0 +1,8 @@
+/translation to goal from amber's solution.
+i:!n:"i"$(ARGS 1)or 1000
+R:16; A:{1%1+x+0.5*s*1+s:x+i}'i
+G:{x_y#i}'[-1_b;1_b:?(R*!uc n%R),n]
+mv:{[v]v math.mmu´A}
+mt:{[w]+/{math.mmu[p.w x;A x]}'G}
+B:mt mv@; u:B v:B 9(B B@)/n#1.0
+say"%.9f"$sqrt(math.mmu[u;v])%math.mmu[v;v]
