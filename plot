@@ -7,15 +7,27 @@ a=t.groupby(['suite','imp']).agg({'walltime':['median'],'memory':['median'],'cpu
 a.columns=[c[0]for c in a.columns];a=a.reset_index()
 n=merge(a,a.groupby(['suite'])['walltime'].min(),on='suite')
 n['norm']=n['walltime_x']/n['walltime_y']
-s=n.groupby('imp')['norm'].mean().sort_values()
-n['imp']=Categorical(n['imp'],categories=s.index,ordered=True)
+
 f=n.query("returnvalue==0")
-p=(ggplot(f) + geom_boxplot(aes(x="factor(imp)", y="norm"))
+s=f.groupby('imp')['norm'].mean().sort_values()
+f['imp']=Categorical(f['imp'],categories=s.index,ordered=True)
+g = (
+    f.groupby(['imp'])['norm']
+    .agg(ymin='min', ymax='max',centre='mean')
+    .reset_index()
+)
+print(g)
+p=(ggplot(g, aes(x='imp',y='centre'))
+ + geom_errorbar(aes(ymin='ymin', ymax='ymax'), color='gray', width=0.2, size=1)
+ + geom_point(size=3, color='gray')
+ + theme_light()
  + labs(title="How many times slower?",
         x="Language Implementation",
         y="Program elapsed seconds%fastest program")
- + scale_y_log10())
+ + scale_y_log10()
+)
 p.save(f'{m}.svg')
+
 t='''<table><tr><th>&#215; <th>source <th>secs <th>mem <th>gz <th>cpu secs</tr><tr>'''
 imp=json.load(open("imp.json"))
 for n,x in n.groupby('suite'):
