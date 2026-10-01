@@ -3,7 +3,7 @@
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn")
        l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap");peachq:("q";"peach.q")]
 call:(!imp)!(" "/,)@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")};call["peachq"]:{" "/(*imp["peachq"];x;"-q")}
-all:..[knucleotide:20 24;nbody:18 26;spectralnorm:8 15;collatz:16 17] /the ranges for n (size of input/argument to each benchmark) /;bigfact:7 11
+all:..[knucleotide:25 27;nbody:20 30;spectralnorm:9 25;collatz:15 24] /the ranges for n (size of input/argument to each benchmark)
 rnd:"collatz""spectralnorm"
 ?[~"r1"in ARGS;rge:rnd#all;rge:rnd^all]
 say rge;
@@ -15,7 +15,7 @@ say"cores "+cores:","/=-bash corescmd
 system:{?["e"~@x:bash x;(.x)..code;0]};isfile:{~"e"=@x:stat x};isdir:{(~"e"=@x:stat x)and x"dir"};assert:{?[~x;"fail"+1;x]}
 rexcmd:{[t;input;output;argv]
  "runexec --walltimelimit ${t}s --memlimit 2GB  --cores $cores --input $input --output >(tail +7 >$output) -- $argv"}
-rex:{[t;input;output;argv]bash rexcmd[t;input;output;argv]}
+rex:{[t;input;output;argv]{!/+"="\'=-x}bash rexcmd[t;input;output;argv]}
 
 "imp.json"say""json imp /write imp for use in plot
 
@@ -24,31 +24,35 @@ rex:{[t;input;output;argv]bash rexcmd[t;input;output;argv]}
 
 /generate input for benchmarks that need it
 rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
-{[s;r]{[s|i]n:$*/i#2;(s in!gen)and [ogi:"o/"+gen[s]+"-$i";(isfile ogi)or rex[5;"/dev/null";ogi;"o/"+gen[s]+" $n"]]}'rg r}.'+(!;.)@`all
+{[s;r]{[s|i]n:$*/i#2;(s in!gen)and [ogi:"o/"+gen[s]+"-$i";(isfile ogi)or rex[20;"/dev/null";ogi;"o/"+gen[s]+" $n"]]}'rg r}.'+(!;.)@`all
 
-/run the python benchmarks with increasing n until python takes longer than 5s (writes json to o/n)
+/run the python benchmarks with increasing n until python takes longer than tt (writes json to o/n)
+tt:1(6*)\30
 d:?[isfile["o/n"];"i"$json read"o/n";(0#"")!!0]
 ?[~#d
  [{[s;r]?[s in!d;:
   {[s|;x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
-    r:system rexcmd[5;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
+    r:system rexcmd[*tt;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
     ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]];say s,r}.'+(!;.)@`all;"o/n"say""json d]
  :]
 
 say n:(!rge)#d /the n for this round
 
 /here is where the real work happens
-src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1};dif:{[f;s;n]system"diff $f o/$s-$n-check"};tim:{?["e"~@x:stat[x];0;x"mtime"]}
-t30:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
-   w:"terminationreason=walltime\n";bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];call[i]@?[f;f;bn]]
-   arg:?[s in!gen;"";$*/n#2];u say"suite=$s\nimp=$i";u print ""/w\out:rex[30;inp;t;"$cmd $arg"];u say"--";flush u;w in out}
+want:" "\"suite imp starttime returnvalue walltime cputime memory"
+src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1};dif:{[f;s;n]system"diff $f o/$s-$n-check"};tim:{?["e"~@x:stat[x];0;x"mtime"]};um:"unixmicro";tu:{time[x]}
+flt:{k:!x;@[k;&k="exitsignal";:;"returnvalue"]!. x}
+t6:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
+   bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];call[i]@?[f;f;bn]]
+   arg:?[s in!gen;"";$*/n#2];u say ""json("suite""imp"!(s;i)),flt out:rex[tt 1;inp;t;"$cmd $arg"];flush u;"terminationreason"in !out}
 /eg run1[suite;imp;file] ./run -1 knucleotide goal knucleotide.goal
-run1:{[s;i;f]t:{[s;i|x]t30[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=dif[b;s;n s];rm'a,b}
+run1:{[s;i;f]t:{[s;i|x]t6[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=dif[b;s;n s];rm'a,b}
 ?["-1"in ARGS;run1 . (1+ARGS?"-1")_ARGS;[l:()
  {[s;n]
   {[s;n|i;x]?[bn:src[s;x];:;:1];?[tim[v:*|l,:"o/$s-$n-$i-run"]<tim bn;:;:1];w:"w"open tw:tmp"";
             ?[i="gcc";(tim["o/$s"]<tim bn)and system"gcc $gcco $bn -oo/$s";:] /compile c program
-   {[s;n;i;x;w|;j]t:tmp 0;r:(0=t30[w;t;s;n;i;x;""])and 0=dif[t;s;n];rm t;r}/[1=;1;!15];close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
+   {[s;n;i;x;w|;j]t:tmp 0;r:(0=t6[w;t;s;n;i;x;""])and 0=dif[t;s;n];rm t;r}/[{((tt[1]*1e6)>tu[um]-x)&1=y}tu um;1;!15];close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
  /convert the output to a csv
- ?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ x)1) or x}''x}@=-1_'-1_"--\n"\""/read'l
+  ?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/(,k),+.{((rx/(.*[0-9])[Bs]$/x)1)or x}''{k::!*x;v:+.'x;k!v}@,/{{want#json x}'=-read x}' \l
+ /?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ \x)1)or x}''x}@ \+{#[want;]'json'=-read x}'l
 ]]
