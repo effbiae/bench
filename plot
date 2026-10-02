@@ -29,8 +29,9 @@ p=(ggplot(g, aes(x='imp',y='centre'))
 )
 p.save(f'{m}.svg')
 
-t='''<table><tr><th>&#215; <th>source <th>secs <th>mem <th>gz <th>cpu secs</tr><tr>'''
-imp=json.load(open("imp.json"))
+t='''<table><tr><th>&#215; <th>source <th>2^ <th>secs <th>mem <th>gz <th>cpu secs</tr><tr>'''
+imp,nj=[json.load(open(x))for x in["imp.json","o/n"]]
+
 for n,x in n.groupby('suite'):
  x=x.sort_values(by='norm')
  print(x)
@@ -43,9 +44,9 @@ for n,x in n.groupby('suite'):
   a1=a.query('suite==@n and imp==@i').groupby(['suite','imp']).filter(lambda x: len(x)==1)
   tr=r['terminationreason'];rv=r['returnvalue']
   t+='<tr>'+(
-   f"""<td>{r['norm']:#.3g} <td><a href="{h}">{bn}</a> <td>{r['walltime_x']:.3g} <td>{r['memory']/1e3:,.0f}
+   f"""<td>{r['norm']:#.3g} <td><a href="{h}">{bn}</a> <td>{nj[n]} <td>{r['walltime_x']:.3g} <td>{r['memory']/1e3:,.0f}
        <td>{gz:,}           <td>{r['cputime']:,.3g}"""if rv==0 else 
-   f"""<td>x                <td><a href="{h}">{bn}</a> <td>'{tr}({rv})           <td>{r['memory']/1e3:,.0f}
+   f"""<td>x                <td><a href="{h}">{bn}</a> <td>{nj[n]} <td>'{tr}({rv})           <td>{r['memory']/1e3:,.0f}
        <td>{gz:,}           <td>'{tr}({rv})""")+'</tr>'
  t+=("<tr></tr>")
 t+=("</table>")
