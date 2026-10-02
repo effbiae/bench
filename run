@@ -3,7 +3,7 @@
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn")
        l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap");peachq:("q";"peach.q")]
 call:(!imp)!(" "/,)@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")};call["peachq"]:{" "/(*imp["peachq"];x;"-q")}
-all:..[knucleotide:25 27;nbody:20 30;spectralnorm:9 25;collatz:15 24] /the ranges for n (size of input/argument to each benchmark)
+all:..[knucleotide:25 27;nbody:20 30;spectralnorm:9 25;collatz:18 19] /the ranges for n (size of input/argument to each benchmark)
 rnd:"collatz""spectralnorm"
 ?[~"r1"in ARGS;rge:rnd#all;rge:rnd^all]
 say rge;
@@ -27,7 +27,7 @@ rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
 {[s;r]{[s|i]n:$*/i#2;(s in!gen)and [ogi:"o/"+gen[s]+"-$i";(isfile ogi)or rex[20;"/dev/null";ogi;"o/"+gen[s]+" $n"]]}'rg r}.'+(!;.)@`all
 
 /run the python benchmarks with increasing n until python takes longer than tt (writes json to o/n)
-tt:1(6*)\?["-t"in ARGS; \"i"$ARGS 1+ARGS?"-t";30]
+tt:1(6*)\?["-t"in ARGS;"i"$ARGS 1+ARGS?"-t";30]
 d:?[isfile["o/n"];"i"$json read"o/n";(0#"")!!0]
 ?[~#d
  [{[s;r]?[s in!d;:
@@ -51,9 +51,7 @@ run1:{[s;i;f]t:{[s;i|x]t6[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];asse
  {[s;n]
   {[s;n|i;x]?[bn:src[s;x];:;:1];?[tim[v:*|l,:"o/$s-$n-$i-run"]<tim bn;:;:1];w:"w"open tw:tmp"";
             ?[i="gcc";(tim["o/$s"]<tim bn)and system"gcc $gcco $bn -oo/$s";:] /compile c program
-   {[s;n;i;x;w|;j]t:tmp 0;r:(0=t6[w;t;s;n;i;x;""])and 0=dif[t;s;n];rm t;r}/[{((tt[1]*1e6)>tu[um]-x)&1=y}tu um;1;!15];close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
+   {[s;n;i;x;w|;j]t:tmp 0;r:(0=t6[w;t;s;n;i;x;""])and assert 0=dif[t;s;n];rm t;r}/[{((tt[1]*1e6)>tu[um]-x)&1=y}tu um;1;!15];close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
  /convert the output to a csv
-  /["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/(,k),+.{((rx/(.*[0-9])[Bs]$/x)1)or x}''{k::!*x;v:+.'x;k!v}@,/{{want#json x}'=-read x}' \l
-  ?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/(,want),+.{((rx/(.*[0-9])[Bs]$/x)1)or x}''want!+,/{{(json x)[want]}'=-read x}'l
- /?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/{(,**x),@[;1]'x}@+'"="\'{{((rx/(.*[0-9])[Bs]$/ \x)1)or x}''x}@ \+{#[want;]'json'=-read x}'l
+ ?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/(,want),+.{((rx/(.*[0-9])[Bs]$/x)1)or x}''want!+,/{{(json x)[want]}'=-read x}'l
 ]]
