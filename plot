@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-from plotnine import*;from pandas import *;from subprocess import run;import os,json,sys
+from plotnine import*;from pandas import *;from subprocess import run;import os,json,sys;from scipy.stats import gmean
 m=(sys.argv+["index"])[1]
-want='suite imp memory cputime walltime returnvalue'.split()
+want='suite imp memory cputime walltime returnvalue terminationreason'.split()
 t=read_csv(f"{m}.csv")[want]
-a=t.groupby(['suite','imp']).agg({'walltime':['median'],'memory':['median'],'cputime':['median'],'returnvalue':['max']})
+a=t.groupby(['suite','imp']).agg({'walltime':['median'],'memory':['median'],'cputime':['median'],'returnvalue':['max'],
+                                  'terminationreason':['first']})
 a.columns=[c[0]for c in a.columns];a=a.reset_index()
 n=merge(a,a.groupby(['suite'])['walltime'].min(),on='suite')
 n['norm']=n['walltime_x']/n['walltime_y']
 
 f=n.query("returnvalue==0")
-s=f.groupby('imp')['norm'].mean().sort_values()
+s=f.groupby('imp')['norm'].apply(gmean).sort_values()
 f['imp']=Categorical(f['imp'],categories=s.index,ordered=True)
 g = (
     f.groupby(['imp'])['norm']
-    .agg(ymin='min', ymax='max',centre='mean')
+    .agg(ymin='min', ymax='max',centre=gmean)
     .reset_index()
 )
 print(g)
@@ -40,11 +41,12 @@ for n,x in n.groupby('suite'):
   h=f'https://github.com/effbiae/bench/blob/master/s/{n}/{bn}'
   gz=len(run(f'gzip -c s/{n}/{bn}', shell=True, capture_output=True, text=False, check=True).stdout)
   a1=a.query('suite==@n and imp==@i').groupby(['suite','imp']).filter(lambda x: len(x)==1)
+  tr=r['terminationreason'];rv=r['returnvalue']
   t+='<tr>'+(
    f"""<td>{r['norm']:#.3g} <td><a href="{h}">{bn}</a> <td>{r['walltime_x']:.3g} <td>{r['memory']/1e3:,.0f}
-       <td>{gz:,}           <td>{r['cputime']:,.3g}"""if r['returnvalue']==0 else 
-   f"""<td>x                <td><a href="{h}">{bn}</a> <td>'limit                <td>{r['memory']/1e3:,.0f}
-       <td>{gz:,}           <td>'limit""")+'</tr>'
+       <td>{gz:,}           <td>{r['cputime']:,.3g}"""if rv==0 else 
+   f"""<td>x                <td><a href="{h}">{bn}</a> <td>'{tr}({rv})           <td>{r['memory']/1e3:,.0f}
+       <td>{gz:,}           <td>'{tr}({rv})""")+'</tr>'
  t+=("<tr></tr>")
 t+=("</table>")
 content={'index':'''<p>This is the current round of the benchmarks game.  See <a href=r1.html>Round 1</a> for the last round performance.  It's never too late to add your language to this round or previous rounds or to improve any program from any round.  
