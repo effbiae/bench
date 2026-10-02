@@ -50,8 +50,17 @@ for n,x in n.groupby('suite'):
  t+=("<tr></tr>")
 t+=("</table>")
 content={'index':'''<p>This is the current round of the benchmarks game.  See <a href=r1.html>Round 1</a> for the last round performance.  It's never too late to add your language to this round or previous rounds or to improve any program from any round.  
-    <p>See description of <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/spectralnorm.html#spectralnorm">spectralnorm</a>. collatz requires the length of the collatz sequence starting at 1+2^x
-    ''','r1':'''    <p>These are the descriptions for <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/nbody.html#nbody">nbody</a> and <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/knucleotide.html#knucleotide>knucleotide</a> benchmarks.
+    <p>See description of 
+        <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/spectralnorm.html#spectralnorm">spectralnorm</a>. collatz requires the length of the collatz sequence starting at 1+2^x
+    <p>Reference implementations are 
+        <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/program/spectralnorm-python3-8.html>spectralnorm.py</a> and 
+        <a href=https://github.com/effbiae/bench/blob/master/s/ref/collatz.py>collatz.py</a>
+    ''','r1':'''    <p>These are the descriptions for 
+       <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/nbody.html#nbody">nbody</a> and
+       <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/knucleotide.html#knucleotide>knucleotide</a> benchmarks.
+    <p>Reference implementations are 
+        <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/program/nbody-python3-8.html>nbody.py</a> and 
+        <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/program/knucleotide-python3-1.html>knucleotide.py</a>
     <p>Python and gcc are included in the game as the languages to beat.
     '''}
 
