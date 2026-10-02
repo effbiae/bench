@@ -1,9 +1,12 @@
-B:16777216;c:{[y]{(B!x)+0,-1_ _x%B}/y,0};z:{(1+|/&0<x)#x};ms:{[y;s;r]z c((s*y)+r*0=!#y),0}
-pw3:{[k;o]r:{[y;i]ms[y;387420489;0]}/[,1;!_k%18];r:ms[r;*/(18!k)#3;0];r:$[o;ms[r;2;0];r];ms[r;1;1]}
-sh:{[y;k]d:*/k#2;e:_B%d;z[(_y%d)+e*d!1_y,0]};tb:{[b]w:{[y]0<y 1}{[y]$[2!y 0;(1+3*y 0;y 1;1+y 2);(_0.5*y 0;-1+y 1;y 2)]}/(b;8;0);(w 2;w 0)}
-(TP;TR):+tb'!256;ws:{[w]i:256!w;(TR[i]+(*/(TP i)#3)*_w%256;TP i)};lw:{[w]z[c[,w]]}
-mp:{[y;p]$[p<19;ms[y;*/p#3;0];ms[ms[y;*/(_0.5*p)#3;0];*/(p-_0.5*p)#3;0]]}
-blk:{[y]a:ws[*y];b:ws[a 0];d:ws[b 0];p:(a 1)+(b 1)+d 1;h:mp[z[1_y];p];u:lw[d 0];n:(#h)|#u;(z[c[(n#h,n#0)+n#u,n#0]];24+p)}
-tail:{[y]v:+/y*{[i]*/i#B}'!#y;({[s]1<s 0}{[s]$[2!s 0;(1+3*s 0;1+s 1);(_0.5*s 0;1+s 1)]}/(v;0))1}
-run:{[n]k:_n%2;o:2!n;r:{[y]2<#y 0}{[y]b:blk[y 0];(b 0;(y 1)+b 1)}/(pw3[k;o];3*k);(r 1)+tail[r 0]}
+/@Fiuzeri Oct 2026 (Adapted to Amber)
+D:-B:*/32#2; PW3:18(3*)\1; (TR;TP):+{2#{8>*|x}({$[2!x;(1+3*x;1+y;z);(-2!x;y;1+z)]}.)/x,0 0}'!256; PW3TP: PW3 TP
+carry:{(B!x)+0 :':D!x,:0} / only one round of carrying fixes the bottom word
+trim:{(-*>|0<x)_x}
+pow3:{carry (PW3 18!y)*(-18!y){carry x*PW3 18}/x} / loop instead of recursion: no call-stack limit
+
+byte:{((TR i)+(PW3TP i)*-256!x;y+TP i:256!x)}.
+word:{(w;p):4 byte/(*x),0; (trim carry @[;0 1;+;(B;D)!'w] pow3[1_x;p];y+32+p)}.
+tail:{*|{1<*x}({($[2!x;1+3*x;-2!x];y+1)}.)/(*x;y)}.
+
+run:{tail{1<#*x}word/(trim carry @[;0;+;1] pow3[,1+2!x;-2!x];3*-2!x)}
 `0:$run@. `argv 2
