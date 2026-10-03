@@ -44,14 +44,16 @@ src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1};dif:{[f;s;n]system"diff $f o/$s-$n-check"}
 flt:{k:!x;r:@[k;&k="exitsignal";:;"returnvalue"]!. x;?[tr in!r;r;r,(,tr)!,""]}
 t6:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
    bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];call[i]@?[f;f;bn]]
-   arg:?[s in!gen;"";$*/n#2];u say ""json("suite""imp"!(s;i)),flt out:rex[tt 1;inp;t;"$cmd $arg"];flush u;tr in !out}
+   arg:?[s in!gen;"";$*/n#2];u say ""json("suite""imp"!(s;i)),flt out:rex[tt 1;inp;t;"$cmd $arg"];flush u;assert(~"e"=@out);(tr in!out)or "i"$out["returnvalue"]}
 /eg run1[suite;imp;file] ./run -1 knucleotide goal knucleotide.goal
 run1:{[s;i;f]t:{[s;i|x]t6[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];assert 0=dif[b;s;n s];rm'a,b}
 ?["-1"in ARGS;run1 . (1+ARGS?"-1")_ARGS;[l:()
  {[s;n]
   {[s;n|i;x]?[bn:src[s;x];:;:1];?[tim[v:*|l,:"o/$s-$n-$i-run"]<tim bn;:;:1];w:"w"open tw:tmp"";
             ?[i="gcc";(tim["o/$s"]<tim bn)and system"gcc $gcco $bn -oo/$s";:] /compile c program
-   {[s;n;i;x;w|;j]t:tmp 0;r:(0=t6[w;t;s;n;i;x;""])and assert 0=dif[t;s;n];rm t;r}/[{((tt[1]*1e6)>tu[um]-x)&1=y}tu um;1;!15];close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
+   r:{[s;n;i;x;w|;j]t:tmp 0;r:(0=dif[t;s;n]),0=t6[w;t;s;n;i;x;""];rm t;r}/[{((tt[1]*1e6)>tu[um]-x)&1=&/y}tu um;1;!15]
+   assert@=/r;close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
  /convert the output to a csv
  ?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/(,want),+.{((rx/(.*[0-9])[Bs]$/x)1)or x}''want!+,/{{(json x)[want]}'=-read x}'l
 ]]
+"GOAMD64=v3 go build -o /path/to/bin/goal -tags full ./cmd/goal"

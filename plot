@@ -6,7 +6,7 @@ t=read_csv(f"{m}.csv")[want]
 a=t.groupby(['suite','imp']).agg({'walltime':['median'],'memory':['median'],'cputime':['median'],'returnvalue':['max'],
                                   'terminationreason':['first']})
 a.columns=[c[0]for c in a.columns];a=a.reset_index()
-n=merge(a,a.groupby(['suite'])['walltime'].min(),on='suite')
+n=merge(a,a.query("returnvalue==0").groupby(['suite'])['walltime'].min(),on='suite')
 n['norm']=n['walltime_x']/n['walltime_y']
 
 f=n.query("returnvalue==0")
