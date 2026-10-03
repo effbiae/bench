@@ -1,21 +1,12 @@
-/translated to goal from collatz.amber.k.
-Bm:-B:16777216
-c:{{(B!x)+»Bm!x}/x,0}; cz:{(1+*|&0<x)#x}
-ms:{[x;s;r]cz c((s*x)+r*1»&#x),0}
-pw3:{[k;n]r:(-18!k){ms[x;387420489;0]}/,1
-          r:ms[r;*/(18!k)#3;0]; r:?[n;ms[r;2;0];r]; ms[r;1;1]}
-tb:{w:{0<x 1}{?[2!x 0;(1+3*x 0;x 1;1+x 2);(-2!x 0;-1+x 1;x 2)]}/(x;8;0)
-    (w 2;w 0)}
-(TP;TR):+tb'!256
-ws:{i:256!x; (TR[i]+(*/(tpi:TP i)#3)*-256!x;tpi)}
-lw:{cz c@,x}
-mp:{[x;p]?[p<19; ms[x;*/p#3;0]; ms[ms[x;*/hp#3;0];*/(p-hp:-2!p)#3;0]]}
-blk:{a:ws@*x; b:ws a 0; d:ws b 0; p:+[a 1;b 1;d 1]
-     h:mp[cz 1_x;p]; u:lw d 0; n:(#h)|#u
-     (cz c(n#h,n0)+n#u,n0:&n;24+p)}
-tail:{v:+/x*{*/x#B}'!#x
-      ({1<x 0}{?[2!x 0;(1+3*x 0;1+x 1);(-2!x 0;1+x 1)]}/(v;0))1}
-f:{[n]k:-2!n; od:2!n
-   r:{2<#x 0}{b:blk x 0; (b 0;(x 1)+b 1)}/(pw3[k;od];3*k)
-   (r 1)+tail r 0}
+/ Translated to goal from Fiuzeri's growler/k solution.
+D:-B:*/32#2; PW3:18(3*)\1
+(TR;TP):+{2#{8>*|x}({?[2!x;(1+3*x;1+y;z);(-2!x;y;1+z)]}.)/x,0 0}'!256
+PW3TP:PW3 TP
+carry:{(B!x)+»D!x,:0} / only one round of carrying fixes the bottom word
+trim:{(-*>|0<x)_x}
+pow3:{?[18>y;carry x*PW3 y;o[carry x*PW3 18;y-18]]} / 3^18 * 2^34 < 2^64, it's ok to carry "messily", then add and multiply.
+byte:{((TR i)+(PW3TP i:256!x)*-256!x;y+TP i)}.
+word:{(w;p):4 byte/(*x),0; (trim carry @[;0 1;+;(B;D)!'w] pow3[1_x;p];y+32+p)}.
+tail:{*|{1<*x}({(?[2!x;1+3*x;-2!x];y+1)}.)/(*x;y)}.
+f:{tail{1<#*x}word/(trim carry @[;0;+;1] pow3[,1+2!x;-2!x];3*-2!x)}
 say f@"i"$(ARGS 1)or 32768
