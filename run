@@ -3,11 +3,10 @@
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn")
        l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap");peachq:("q";"peach.q")]
 call:(!imp)!(" "/,)@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")};call["peachq"]:{" "/(*imp["peachq"];x;"-q")}
-all:..[knucleotide:25 27;nbody:20 30;spectralnorm:9 25;collatz:18 19] /the ranges for n (size of input/argument to each benchmark)
-rnd:"collatz""spectralnorm"
-?[~"r1"in ARGS;rge:rnd#all;rge:rnd^all]
-say rge;
-gen:..[knucleotide:"fasta"] /what program generates input
+all:..[knucleotide:25 26;nbody:23 24;spectralnorm:12 13;collatz:18 19;mandelbrot:12 13;fft:19 20] /the ranges for n (size of input/argument to each benchmark)
+rnds:("knucleotide""nbody";"collatz""spectralnorm";"mandelbrot""fft")
+say ARGS[1];?["r"=*a:""\ARGS[1];rnd:"i"$+/1_a;rnd:#rnds];?[rnd;rge:rnds[rnd-1]#all;rge:(*|rnds)#all];say rnd,rge;
+gen:..[knucleotide:"fasta";fft:"wave"] /what program generates input
 gcco:"-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp"
 bash:{say x;run"bash""-c",x}
 corescmd:rq#cat $(find /sys/devices/system/cpu -regex ".*cpu[0-9]+/topology/thread_siblings_list") |sort -n |uniq |cut -d, -f1#
@@ -20,7 +19,7 @@ rex:{[t;input;output;argv]{!/+"="\'=-x}bash rexcmd[t;input;output;argv]}
 "imp.json"say""json imp /write imp for use in plot
 
 ?[isdir"o";::;mkdir"o"]
-{(isfile"o/$x")or system"gcc $gcco s/$x/${x}.c -oo/$x"}'.gen /compile gcc programs
+{(isfile"o/$x")or ?[isfile c:"s/$x/${x}.c";system"gcc $gcco s/$x/${x}.c -oo/$x";bash"ln s/$x/$x o/$x"]}'.gen /compile gcc programs
 
 /generate input for benchmarks that need it
 rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
@@ -33,7 +32,7 @@ d:?[isfile["o/n"];"i"$json read"o/n";(0#"")!!0]
  [{[s;r]?[s in!d;:
   {[s|;x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
     r:system rexcmd[*tt;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
-    ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]];say s,r}.'+(!;.)@`all;"o/n"say""json d]
+    ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]];say s,r}.'+(!;.)@`rge;"o/n"say""json d]
  :]
 
 say n:(!rge)#d /the n for this round
@@ -54,6 +53,6 @@ run1:{[s;i;f]t:{[s;i|x]t6[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];asse
    r:{[s;n;i;x;w|;j]t:tmp 0;r:(0=dif[t;s;n]),0=t6[w;t;s;n;i;x;""];rm t;r}/[{((tt[1]*1e6)>tu[um]-x)&1=&/y}tu um;1;!15]
    assert@=/r;close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
  /convert the output to a csv
- ?["r1"in ARGS;"r1.csv";"index.csv"]say"\n"/","/(,want),+.{((rx/(.*[0-9])[Bs]$/x)1)or x}''want!+,/{{(json x)[want]}'=-read x}'l
+ ?[~rnd=#rnds;"r"+$[rnd]+".csv";"index.csv"]say"\n"/","/(,want),+.{((rx/(.*[0-9])[Bs]$/x)1)or x}''want!+,/{{(json x)[want]}'=-read x}'l
 ]]
 "GOAMD64=v3 go build -o /path/to/bin/goal -tags full ./cmd/goal"

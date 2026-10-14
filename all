@@ -1,6 +1,7 @@
 #!/bin/bash
-for x in r1 index
+set -e
+for x in r1 r2 index
 do
- ./run $x && ./plot $x
+ rm -f o/n && ./run $x && ./plot $x
 done
-cat r1.csv <(tail +2 index.csv)>all.csv
+cat r1.csv <(tail +2 r2.csv) <(tail +2 index.csv)>all.csv
