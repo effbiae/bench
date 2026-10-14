@@ -50,7 +50,7 @@ for n,x in n.groupby('suite'):
  t+=("<tr></tr>")
 t+=("</table>")
 content={'index':'''<p>This is the current round of the benchmarks game.  See <a href=r2.html>Round 2</a> for the last round performance.  It's never too late to add your language to this round or previous rounds or to improve any program from any round.
-    <p> . mandelbrot requires an x by x pbm of the mandelbrot set
+    <p> . mandelbrot requires an x by x portable bitmap (pbm) of the mandelbrot set
     <p> . fft requires the top 10 frequencies detected in the input. input is one second of a signal. list a table of frequencies in the format "(frequency)\\t(amplitude)" up to 9 decimal places.
     <p>Reference implementations are
         <a href=https://github.com/effbiae/bench/blob/master/s/ref/mandelbrot.py>mandelbrot.py</a> and
