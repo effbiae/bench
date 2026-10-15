@@ -28,12 +28,11 @@ rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
 /run the python benchmarks with increasing n until python takes longer than tt (writes json to o/n)
 tt:1(6*)\?["-t"in ARGS;"i"$ARGS 1+ARGS?"-t";30]
 d:?[isfile["o/n"];"i"$json read"o/n";(0#"")!!0]
-?[~#d
+?[&/(!rge)in!d;:
  [{[s;r]?[s in!d;:
   {[s|;x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
     r:system rexcmd[*tt;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
-    ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]];say s,r}.'+(!;.)@`rge;"o/n"say""json d]
- :]
+    ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]];say s,r}.'+(!;.)@`rge;"o/n"say""json d]]
 
 say n:(!rge)#d /the n for this round
 

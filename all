@@ -1,7 +1,16 @@
 #!/bin/bash
 set -e
-for x in r1 r2 index
+a=$(seq 1 2 | sed 's/^/r/')
+rm -f all.csv
+first=true
+for x in $a index
 do
- rm -f o/n && ./run $x && ./plot $x
+ ./run $x && ./plot $x
+ if $first
+ then
+   cat $x.csv >>all.csv
+   first=false
+ else
+   tail +2 $x.csv >>all.csv
+ fi
 done
-cat r1.csv <(tail +2 r2.csv) <(tail +2 index.csv)>all.csv
