@@ -3,16 +3,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.fft import fft, fftfreq
 
-signal = [float(x)for x in sys.stdin.readlines()]
+def lcg(seed,a,c,m):
+    return (a * seed + c) % m
+
+def nlcg(n,seed,a,c,m):
+    Xn = seed
+    r = []
+    for i in range(n):
+        Xn = lcg(Xn,a,c,m)
+        r.append(Xn)
+    return r
+
+N=int((sys.argv+[16])[1])
+input=[i/2**31 for i in nlcg(N,N,1103515245,12345,2**31)]
+
 # Parameters
-fs = len(signal) # Sampling frequency (Hz)
-duration = 1.0  # Duration (seconds)
-sampling_rate = len(signal) # Hz (Number of samples per second)
-N = int(sampling_rate * duration) # Total number of samples
+fs = N            # Sampling frequency (Hz)
+duration = 1.0    # Duration (seconds)
+sampling_rate = N # Hz (Number of samples per second)
 
 # 2. Compute the FFT
 # The raw FFT contains complex numbers and is symmetric (two-sided)
-fft_raw = fft(signal)
+fft_raw = fft(input)
 
 # 3. Calculate the true physical frequencies
 # fftfreq generates the correct frequency bins based on sample count and rate
