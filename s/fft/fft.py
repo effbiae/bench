@@ -15,7 +15,7 @@ def nlcg(n,seed,a,c,m):
     return r
 
 N=int((sys.argv+[16])[1])
-input=[i/2**31 for i in nlcg(N,N,1103515245,12345,2**31)]
+input=[i/2**30-1 for i in nlcg(N,N,1103515245,12345,2**31)]
 
 # Parameters
 fs = N            # Sampling frequency (Hz)
