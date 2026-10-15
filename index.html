@@ -9,13 +9,15 @@
 
     <p id="chart-fastest-elapsed"><img src="index.svg" alt="Benchmark program elapsed seconds compared to the fastest for selected programming language implementations." title="">
     <section><table><tr><th>&#215; <th>source <th>2^ <th>secs <th>mem <th>gz <th>cpu secs</tr><tr><tr><td>1.00 <td><a href="https://github.com/effbiae/bench/blob/master/s/fft/fft.py">fft.py</a> <td>19 <td>1.31 <td>260,612
-       <td>744           <td>1.17</tr><tr></tr><tr><td>1.00 <td><a href="https://github.com/effbiae/bench/blob/master/s/mandelbrot/mandelbrot.growler.k">mandelbrot.growler.k</a> <td>12 <td>0.556 <td>28,340
-       <td>412           <td>0.551</tr><tr><td>50.7 <td><a href="https://github.com/effbiae/bench/blob/master/s/mandelbrot/mandelbrot.py">mandelbrot.py</a> <td>12 <td>28.2 <td>15,028
-       <td>476           <td>28.1</tr><tr></tr></table></section>
+       <td>744           <td>1.17</tr><tr></tr><tr><td>1.00 <td><a href="https://github.com/effbiae/bench/blob/master/s/mandelbrot/mandelbrot.growler.k">mandelbrot.growler.k</a> <td>11 <td>0.166 <td>9,478
+       <td>434           <td>0.162</tr><tr><td>46.0 <td><a href="https://github.com/effbiae/bench/blob/master/s/mandelbrot/mandelbrot.py">mandelbrot.py</a> <td>11 <td>7.63 <td>13,652
+       <td>476           <td>7.59</tr><tr></tr></table></section>
 
-    <p>This is the current round of the benchmarks game.  See <a href=r2.html>Round 2</a> for the last round performance.  It's never too late to add your language to this round or previous rounds or to improve any program from any round.
+    <p>This is the current round of the benchmarks game.  See <a href=r2.html>Round 2</a> for the last round performance.
     <p> . mandelbrot requires an x by x portable bitmap (pbm) of the mandelbrot set
-    <p> . fft requires the top 10 frequencies detected in the input. input is one second of a signal. list a table of frequencies in the format "(frequency)\t(amplitude)" up to 9 decimal places.
+    <p> . fft requires the top 10 frequencies detected in the input. input is one second of a signal and is generated with a LCG prng
+         (see <a href=https://github.com/effbiae/bench/blob/master/s/ref/fft.py>s/ref/fft.py</a> for parameters).
+         list a table of frequencies with tab separated frequency and amplitude up to 9 decimal places.
     <p>Reference implementations are
         <a href=https://github.com/effbiae/bench/blob/master/s/ref/mandelbrot.py>mandelbrot.py</a> and
         <a href=https://github.com/effbiae/bench/blob/master/s/ref/fft.py>fft.py</a>
@@ -24,6 +26,7 @@
     <p>&nbsp;<p>&nbsp;
     <p>Please contribute more programs for your favourite array language.
        There is no restriction on algorithms, unlike the CLBG.
+    <p>It's never too late to add your language to this round or previous rounds or to improve any program.
     <p>Please propose interesting new benchmarks
     <p>The benchmark is run on an i5-1135g7 (tiger lake, some avx512) and each process is limited to 2GB of memory
   </div>

@@ -49,13 +49,15 @@ for n,x in n.groupby('suite'):
        <td>{gz:,}           <td>'{tr}({rv})""")+'</tr>'
  t+=("<tr></tr>")
 t+=("</table>")
-content={'index':'''<p>This is the current round of the benchmarks game.  See <a href=r2.html>Round 2</a> for the last round performance.  It's never too late to add your language to this round or previous rounds or to improve any program from any round.
+content={'index':'''<p>This is the current round of the benchmarks game.  See <a href=r2.html>Round 2</a> for the last round performance.
     <p> . mandelbrot requires an x by x portable bitmap (pbm) of the mandelbrot set
-    <p> . fft requires the top 10 frequencies detected in the input. input is one second of a signal. list a table of frequencies in the format "(frequency)\\t(amplitude)" up to 9 decimal places.
+    <p> . fft requires the top 10 frequencies detected in the input. input is one second of a signal and is generated with a LCG prng
+         (see <a href=https://github.com/effbiae/bench/blob/master/s/ref/fft.py>s/ref/fft.py</a> for parameters).
+         list a table of frequencies with tab separated frequency and amplitude up to 9 decimal places.
     <p>Reference implementations are
         <a href=https://github.com/effbiae/bench/blob/master/s/ref/mandelbrot.py>mandelbrot.py</a> and
         <a href=https://github.com/effbiae/bench/blob/master/s/ref/fft.py>fft.py</a>
-''',     'r2':'''<p>This is the round 2 of the benchmarks game.  See <a href=r1.html>Round 1</a> for the previous round performance.  It's never too late to add your language to this round or previous rounds or to improve any program from any round.
+''',     'r2':'''<p>This is the round 2 of the benchmarks game.  See <a href=r1.html>Round 1</a> for the previous round performance.
     <p>See description of
         <a href=https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/spectralnorm.html#spectralnorm">spectralnorm</a>. collatz requires the length of the collatz sequence starting at 1+2^x
     <p>Reference implementations are
