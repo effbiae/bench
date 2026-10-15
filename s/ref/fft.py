@@ -34,19 +34,18 @@ def fft(x):
 
     return X
 
-def lcg(seed,a,c,m):
-    return (a * seed + c) % m
+def rng():
+    global state
+    state = 0xffffffff & (1103515245 * state + 12345)
+    return state >> 16
 
-def nlcg(n,seed,a,c,m):
-    Xn = seed
-    r = []
-    for i in range(n):
-        Xn = lcg(Xn,a,c,m)
-        r.append(Xn)
-    return r
+def nrng(n):
+    global state
+    state=n
+    return [rng()for x in range(n)]
 
 N=int((sys.argv+[16])[1])
-input=[i/2**30-1 for i in nlcg(N,N,1103515245,12345,2**31)]
+input=[i/2**15-1 for i in nrng(N)]
 
 fft_raw = fft(input)
 
