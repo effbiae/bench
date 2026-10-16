@@ -14,3 +14,4 @@ do
    tail +2 $x.csv >>all.csv
  fi
 done
+./lead

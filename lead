@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+from plotnine import*;import os,json,sys;from scipy.stats import gmean;from pandas import *#;from subprocess import run;
+want='suite imp memory cputime walltime returnvalue'.split()
+t=read_csv(f"all.csv")[want].query("returnvalue==0")
+a=t.groupby(['suite','imp']).agg({'walltime':['median'],'memory':['median'],'cputime':['median'],'returnvalue':['max']})
+a.columns=[c[0]for c in a.columns];a=a.reset_index()
+n=merge(a,a.query("returnvalue==0").groupby(['suite'])['walltime'].min(),on='suite')
+n['norm']=n['walltime_x']/n['walltime_y']
+n['walltime']=n['walltime_x']
+n=n[want[:-1]+['norm']]
+s=n.groupby('imp')['norm'].apply(gmean).sort_values()
+n['imp']=Categorical(n['imp'],categories=s.index,ordered=True)
+g = (
+    n.groupby(['imp'])['norm']
+    .agg(ymin='min', ymax='max',gmean=gmean)
+    .reset_index()
+)
+print(g)
+p=(ggplot(g, aes(x='imp',y='gmean'))
+ + geom_errorbar(aes(ymin='ymin', ymax='ymax'), color='gray', width=0.2, size=1)
+ + geom_point(size=3, color='gray')
+ + theme_light()
+ + labs(title="How many times slower? -- Min, Max and Geometric Mean",
+        x="Language Implementation",
+        y="Program elapsed seconds%fastest program")
+ + scale_y_log10()
+)
+p.save(f'lead.svg')
+
+p='''
+<html><head><title>benchmarking array languages: leaderboard</title><link rel=stylesheet href=page.css></head>
+<header>
+  <h3><a href="index.html">The&nbsp;<small>Array&nbsp;Language</small><br>Benchmarks&nbsp;Game</a></h3>
+</header>
+<article>
+  <h1>The Game Leaderboard</h1>
+  <p>The central dot is the geometric mean of normalized time. High and low bars are minimum and maximum normalized time.
+  <p>There's not enough data for a box plot yet.
+  <div>
+    <p id="chart-fastest-elapsed"><img src="lead.svg" alt="Benchmark program elapsed seconds compared to the fastest for selected programming language implementations." title="">
+
+    <p>&nbsp;<p>&nbsp;
+    <p>Download <a href=all.csv>raw data</a>. See
+                <a href=https://github.com/effbiae/bench/blob/master/lead>chart generating script</a>.
+  </div>
+</article>
+<footer>
+    <p>contact jack: @effbiae on the  <a href="https://discord.gg/uCNMrN9Hv">APL Farm discord</a> or @effb.ae on <a href=https://matrix.to/#/@effb.ae:matrix.org>matrix</a> or effbiae@gmail.com
+    <p><br>&nbsp;
+</footer>
+
+</html>
+
+'''
+with open('lead.html','w')as f:f.write(p)
+sys.exit(0)
