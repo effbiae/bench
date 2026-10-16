@@ -1,8 +1,8 @@
 #!/usr/bin/env goal
 /implementations with executable name and file extensions
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn")
-       l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap");peachq:("q";"peach.q")]
-call:(!imp)!(" "/,)@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")};call["peachq"]:{" "/(*imp["peachq"];x;"-q")}
+       l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap");peachq:("q";"peach.q");ktye:("i";"ktye.k")]
+call:(!imp)!(" "/,)@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")};call["peachq"]:{" "/(*imp["peachq"];x;"-q")};call["ktye"]:{" "/("i";x;"-e")}
 all:..[knucleotide:25 26;nbody:23 24;spectralnorm:12 13;collatz:18 19;mandelbrot:13 14;fft:19 20] /the ranges for n (size of input/argument to each benchmark)
 rnds:("knucleotide""nbody";"collatz""spectralnorm";"mandelbrot""fft")
 say ARGS[1];?["r"=*a:""\ARGS[1];rnd:"i"$+/1_a;rnd:#rnds];?[rnd;rge:rnds[rnd-1]#all;rge:(*|rnds)#all];say rnd,rge;
@@ -40,7 +40,7 @@ say n:(!rge)#d /the n for this round
 want:(" "\"suite imp starttime returnvalue walltime cputime memory"),tr:"terminationreason"
 src:{[s;x]*{isfile'x}#"s/$s/$s."+x 1};dif:{[f;s;n]system"diff $f o/$s-$n-check"};tim:{?["e"~@x:stat[x];0;x"mtime"]};um:"unixmicro";tu:{time[x]}
 flt:{k:!x;r:@[k;&k="exitsignal";:;"returnvalue"]!. x;?[tr in!r;r;r,(,tr)!,""]}
-t6:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";"/dev/null"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
+t6:{[u;t;s;n;i;x;f]gens:gen s;inp:?[s in!gen;"o/$gens-$n";{[n|x]x say */n#2;x}"o/inp"];?[(i="gcc")&~""~f;assert 0=system"gcc $gcco $f -oo/t";:]
    bn:src[s;x];cmd:?[i="gcc";?[f;"./o/t";"./o/$s"];call[i]@?[f;f;bn]]
    arg:?[s in!gen;"";$*/n#2];u say ""json("suite""imp"!(s;i)),flt out:rex[tt 1;inp;t;"$cmd $arg"];flush u;assert(~"e"=@out);(tr in!out)or "i"$out["returnvalue"]}
 /eg run1[suite;imp;file] ./run -1 knucleotide goal knucleotide.goal
@@ -55,3 +55,7 @@ run1:{[s;i;f]t:{[s;i|x]t6[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];asse
  ?[~rnd=#rnds;"r"+$[rnd]+".csv";"index.csv"]say"\n"/","/(,want),+.{((rx/(.*[0-9])[Bs]$/x)1)or x}''want!+,/{{(json x)[want]}'=-read x}'l
 ]]
 "GOAMD64=v3 go build -o /path/to/bin/goal -tags full ./cmd/goal"
+"# build ktye/k
+wget github.com/ktye/i/releases/download/latest/k.c
+gcc -o /home/jack/.local/bin/i -O3 k.c -lm
+"
