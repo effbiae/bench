@@ -34,5 +34,5 @@ amplitude = numpy.abs(fft_raw[:half_N]) / N
 # Multiply by 2 to account for the dropped negative frequencies
 amplitude[1:] = amplitude[1:] * 2
 
-r=sorted(zip(positive_frequencies, amplitude),key=lambda x:-x[1])
-[print(f'{x[0]}\t{x[1]:.9f}')for x in r[:10]]
+a=amplitude.argsort()[::-1][:10]
+[print(f'{x[0]}\t{x[1]:.9f}')for x in list(zip(positive_frequencies[a], amplitude[a]))]

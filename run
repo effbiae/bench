@@ -25,7 +25,7 @@ rex:{[t;input;output;argv]{!/+"="\'=-x}bash rexcmd[t;input;output;argv]}
 tmp:{-run"mktemp"};rm:{bash"rm "+x}
 {[s;r]{[s|i]n:$*/i#2;(s in!gen)and [ogi:"o/"+gen[s]+"-$i";(isfile ogi)or rex[20;"/dev/null";ogi;"o/"+gen[s]+" $n"]]}r}.'+(!;.)@`all
 
-/run the python benchmarks to get the output file (writes json to o/n)
+/run the python benchmarks to get the output file (also writes json to o/n)
 tt:1(2*)\?["-t"in ARGS;"i"$ARGS 1+ARGS?"-t";120]
 d:?[isfile["o/n"];"i"$json read"o/n";(0#"")!!0]
 ?[&/(!rge)in!d;:
@@ -48,7 +48,7 @@ run1:{[s;i;f]t:{[s;i|x]t6[STDOUT;t:tmp 0;s;n s;i;imp i;x];t};a:t[""];b:t[f];asse
  {[s;n]
   {[s;n|i;x]?[bn:src[s;x];:;:1];?[tim[v:*|l,:"o/$s-$n-$i-run"]<tim bn;:;:1];w:"w"open tw:tmp"";
             ?[i="gcc";(tim["o/$s"]<tim bn)and system"gcc $gcco $bn -oo/$s";:] /compile c program
-   r:{[s;n;i;x;w|;j]t:tmp 0;r:(0=dif[t;s;n]),0=t6[w;t;s;n;i;x;""];rm t;r}/[{((tt[1]*1e6)>tu[um]-x)&1=&/y}tu um;1;!15]
+   r:{[s;n;i;x;w|;j]t:tmp 0;r:({assert x;x}0=dif[t;s;n]),0=t6[w;t;s;n;i;x;""];rm t;r}/[{((tt[1]*1e6)>tu[um]-x)&1=&/y}tu um;1;!15]
    assert@=/r;close w;bash"mv $tw $v"}.'+(!;.)@`imp}.'+(!;.)@`n
  /convert the output to a csv
  ?[~rnd=#rnds;"r"+$[rnd]+".csv";"index.csv"]say"\n"/","/(,want),+.{((rx/(.*[0-9])[Bs]$/x)1)or x}''want!+,/{{(json x)[want]}'=-read x}'l
