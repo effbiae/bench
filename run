@@ -3,7 +3,7 @@
 imp:..[gcc:("gcc";"c");growler:("k";"growler.k");python3:("python3";"py");goal:("goal";"goal");bqn:("bqn";"bqn")
        l:("l_l64";"l.k""l.q");amber:("amber";"amber.k");kap:("kap-jvm-text";"kap");peachq:("q";"peach.q");ktye:("i";"ktye.k")]
 call:(!imp)!(" "/,)@'*'. imp;call["kap"]:{" "/(*imp["kap"];"--load="+x;"-n")};call["peachq"]:{" "/(*imp["peachq"];x;"-q")};call["ktye"]:{" "/("i";x;"-e")}
-all:..[knucleotide:25 26;nbody:23 24;spectralnorm:12 13;collatz:18 19;mandelbrot:13 14;fft:21 22] /the ranges for n (size of input/argument to each benchmark)
+all:..[knucleotide:25;nbody:23;spectralnorm:12;collatz:18;mandelbrot:13;fft:21] /the size of input/argument to each benchmark
 rnds:("knucleotide""nbody";"collatz""spectralnorm";"mandelbrot""fft")
 say ARGS[1];?["r"=*a:""\ARGS[1];rnd:"i"$+/1_a;rnd:#rnds];?[rnd;rge:rnds[rnd-1]#all;rge:(*|rnds)#all];say rnd,rge;
 gen:..[knucleotide:"fasta"] /what program generates input
@@ -22,17 +22,16 @@ rex:{[t;input;output;argv]{!/+"="\'=-x}bash rexcmd[t;input;output;argv]}
 {(isfile"o/$x")or ?[isfile c:"s/$x/${x}.c";system"gcc $gcco s/$x/${x}.c -oo/$x";bash"ln s/$x/$x o/$x"]}'.gen /compile gcc programs
 
 /generate input for benchmarks that need it
-rg:{(*x)_!*|x};tmp:{-run"mktemp"};rm:{bash"rm "+x}
-{[s;r]{[s|i]n:$*/i#2;(s in!gen)and [ogi:"o/"+gen[s]+"-$i";(isfile ogi)or rex[20;"/dev/null";ogi;"o/"+gen[s]+" $n"]]}'rg r}.'+(!;.)@`all
+tmp:{-run"mktemp"};rm:{bash"rm "+x}
+{[s;r]{[s|i]n:$*/i#2;(s in!gen)and [ogi:"o/"+gen[s]+"-$i";(isfile ogi)or rex[20;"/dev/null";ogi;"o/"+gen[s]+" $n"]]}r}.'+(!;.)@`all
 
-/run the python benchmarks with increasing n until python takes longer than tt (writes json to o/n)
+/run the python benchmarks to get the output file (writes json to o/n)
 tt:1(2*)\?["-t"in ARGS;"i"$ARGS 1+ARGS?"-t";120]
 d:?[isfile["o/n"];"i"$json read"o/n";(0#"")!!0]
 ?[&/(!rge)in!d;:
  [{[s;r]?[s in!d;:
-  {[s|;x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
-    r:system rexcmd[*tt;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$"
-    ?[r=0;:;[d[s]:x-1;say d;:r]];d[s]:x;r}/[0=;0;rg r]];say s,r}.'+(!;.)@`rge;"o/n"say""json d]]
+  {[s|x]n:*/x#2;inp:?[s in!gen;"o/"+gen[s]+"-$x";"/dev/null"];t:"o/$s-$x-check"
+    r:system rexcmd[*tt;inp;t;"python3 s/$s/${s}.py $n"]+"|grep returnvalue=0\$";assert 0=r;d[s]:x}r];say s,r}.'+(!;.)@`rge;"o/n"say""json d]]
 
 say n:(!rge)#d /the n for this round
 
