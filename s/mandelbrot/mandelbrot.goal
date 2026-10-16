@@ -1,0 +1,12 @@
+/ Translated to goal from Fiuzeri's growler/k code.
+step:{[c;z]c+(-/z*z;2.0*/z)}
+stepk:{[i;c;z;m]i or:~m; o[(~&/m)*i-1;c;z;m|:4.0<+/z*z:7 step[c]/z]}
+block:{[z]
+  ?[&/m:(0.25>+/v*v:z+0.25 0.0)|(0.0625>+/v*v:z+1.0 0.0); m / fully inside discs
+    |/m; (~nan*z)&4.0>+/z*z:49 step[z]/z / partially covered, shortcircuit unlikely
+    stepk[7;z;z;m]]} / fully outside, might shortcircuit
+C:-64!63+N:"i"$(ARGS 1)or 256; base:64#2; d:(|!64 64)[;|>-8!!64*64]
+pb:{2/|+-64$block -1.5 -1.0+2.0*(d+(x;y)*64)%N } / process block
+STDOUT say"P4\n%d %d"$(N;N)
+0i{STDOUT print´"b"$(2/|+-8$)'(N+8!-N)#',/'(|base\:)''+pb[;y]'n}/n:!C
+flush STDOUT
