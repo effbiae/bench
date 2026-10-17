@@ -1,0 +1,33 @@
+/ Translated to goal from amber's solution.
+N:"i"$(ARGS 1)or 524288; M:-2!N; m:4294967296; a:1103515245; c:12345
+pw:{[a;c;n]{[s](A;C;p;q):s
+  (A,m!A*p;C,m!(A*q)+C;m!p*p;m!(p*q)+q)}/[n;(,1;,0;a;c)]}
+lg:-1+#2\:
+B:4096&M; nb:(-B)!M
+(A;C;p;q):pw[m!a*a;m!(a*c)+c;lg B]; A2:m!a*A; C2:m!c+a*C
+(H;J;p;q):pw[p;q;lg nb]
+S:m!J+H*m!(a*N)+c
+(zr;zi):,/'+{[A;C;A2;C2;x]
+    ((3.0517578125e-05*_(m!C+A*x)%65536)-1.0
+     (3.0517578125e-05*_(m!C2+A2*x)%65536)-1.0)}[A;C;A2;C2]'S
+q8:-8!N;t:(6.283185307179586%N)*!q8+1
+c0:cos t; s0:sin t; cq:c0,|-1_s0; sq:s0,|-1_c0
+wc:cq,-|1_-1_cq; ws:sq,|1_-1_sq
+bf:{[tr;ti;R;I]h:-2!#R; er:h#R; ur:h_R; ei:h#I; ui:h_I
+  tiur:ti*ur; trui:tr*ui; tiui:ti*ui; tiuitrur:tiui+tr*ur; truimtiur:trui-ti*ur
+  (er+tiuitrur;er-tiuitrur;ei+truimtiur;ei-truimtiur)}
+st:{[d](R;I):d; s:#R; j:((-s)!M)*!s; ,/'2$+bf'[wc j;ws j;R;I]}
+L:lg M; k:-2!L; P:*/k#2; Q:(-P)!M
+d:k st/(,zr;,zi)
+tw:{[k1;R;I]j:(2*k1)*!Q; g:~j<M; j-:M*g; f:1.0-2.0*g; c:f*wc j; s:f*ws j
+  ((R*c)+I*s;(I*c)-R*s)}
+d:+tw'[!P;d 0;d 1]
+(zr;zi):,/'(L-k) st/(,,/+:)'d
+(ar;ai):1_'(zr;zi); (br;bi):|'(ar;ai)
+Y:{[ar;ai;br;bi;c;s]arbr:ar+br; brmar:br-ar; aibi:ai+bi; aimbi:ai-bi
+  cbrmar:c*brmar; sbrmar:s*brmar; caibi:c*aibi
+  ((arbr+caibi+sbrmar)*arbr+caibi+sbrmar)+(aimbi+cbrmar-s*aibi)*aimbi+cbrmar-s*aibi}
+V:(v*v:(*zr)+*zi),Y[ar;ai;br;bi;1_wc;1_ws]
+i:?[M<640;!M;[b:|/'64$V;&~V<b@(>b)@9]]
+i:(10&#i)#i@>V i
+say"\n"/i{"%.1f\t%.9f"$(x;y)}'(sqrt V i)%N

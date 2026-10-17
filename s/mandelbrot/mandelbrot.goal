@@ -1,12 +1,18 @@
-/ Translated to goal from Fiuzeri's growler/k code.
-step:{[c;z]c+(-/z*z;2.0*/z)}
-stepk:{[i;c;z;m]i or:~m; o[(~&/m)*i-1;c;z;m|:4.0<+/z*z:7 step[c]/z]}
-block:{[z]
-  ?[&/m:(0.25>+/v*v:z+0.25 0.0)|(0.0625>+/v*v:z+1.0 0.0); m / fully inside discs
-    |/m; (~nan*z)&4.0>+/z*z:49 step[z]/z / partially covered, shortcircuit unlikely
-    stepk[7;z;z;m]]} / fully outside, might shortcircuit
-C:-64!63+N:"i"$(ARGS 1)or 256; base:64#2; d:(|!64 64)[;|>-8!!64*64]
-pb:{2/|+-64$block -1.5 -1.0+2.0*(d+(x;y)*64)%N } / process block
-STDOUT say"P4\n%d %d"$(N;N)
-0i{STDOUT print´"b"$(2/|+-8$)'(N+8!-N)#',/'(|base\:)''+pb[;y]'n}/n:!C
-flush STDOUT
+/ Translated to goal from amber's solution.
+N:"n"$n:"i"$(ARGS 1)or 256; k:"i"$uc N%8; ci:-1.0+(2*!n)%N
+h:?[&/d1ci=-|d1ci:1_ci;-2!n;n-1]
+R:2; T:R*8*k; nb:"i"$uc(h+1)%R
+J:(!8)+`8*!k; X:,/(R*k)#'(-1.5+(2*J)%N)+100.0*~J<n
+XA:X-0.25; XA2:XA*XA; XB2:{x*x}X+1.0
+In:{[XA;XA2;XB2;Y;YY](((XA2+YY)*(XA2+YY)+XA)<0.25*YY)|(XB2+YY)<0.0625}
+it:{[cr;ci;s](zr;zi):s; (cr+(zr*zr)-zi*zi;ci+2.0*zr*zi)}
+ok:{[zr;zi]4.0>(zr*zr)+zi*zi}
+ch:{[s;l](zr;zi;cr;ci;id):s; (zr;zi):l it[cr;ci]/(zr;zi)
+  j:&ok[zr;zi]; (zr j;zi j;cr j;ci j;id j)}
+blk:{[b]y:ci (n-1)&(b*R)+!R; Y:T#,/k#'y
+  m:0+In[XA;XA2;XB2;Y;Y*Y]; c:&~m; cr:X c; cy:Y c
+  s:(cr;cy;cr;cy;c)ch/2 3 4 5 6 7 8 9 5; m[s 4]:1
+  2/8$m}
+v:(k*h+1)#,//rt.go(8#(blk'))!8$!nb
+v:?[h<n-1; [r:(h+1)$v; ,/r,|1_(n-h)#r]; v]
+print"P4\n%d %d\n%s"$(n;n;"b"$v)
