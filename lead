@@ -34,6 +34,7 @@ p='''
 </header>
 <article>
   <h1>The Game Leaderboard</h1>
+  <p>This is a summary of all rounds.
   <p>The central dot is the geometric mean of normalized time. High and low bars are minimum and maximum normalized time.
   <p>There's not enough data for a box plot yet.
   <div>
