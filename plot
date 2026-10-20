@@ -3,22 +3,26 @@ from plotnine import*;from pandas import *;from subprocess import run;import os,
 m=(sys.argv+["index"])[1]
 want='suite imp memory cputime walltime returnvalue terminationreason'.split()
 t=read_csv(f"{m}.csv")[want]
-a=t.groupby(['suite','imp']).agg({'walltime':['median'],'memory':['median'],'cputime':['median'],'returnvalue':['max'],
-                                  'terminationreason':['first']})
+imps={'growler':'growler/k','goal':'goal/k','bqn':'CBQN','kiwi':'kiwi/k','l':'l(q,k4)','amber':'amber/k',
+      'peachq':'peach/q','ktye':'ktye/k','deno':'deno/js'}
+impl=lambda x:imps[x]if x in imps else x
+t['impl']=[impl(x)for x in t['imp']]
+a=t.groupby(['suite','imp']).agg({'impl':['first'],'walltime':['median'],'memory':['median'],'cputime':['median'],
+                                  'returnvalue':['max'],'terminationreason':['first']})
 a.columns=[c[0]for c in a.columns];a=a.reset_index()
 n=merge(a,a.query("returnvalue==0").groupby(['suite'])['walltime'].min(),on='suite')
 n['norm']=n['walltime_x']/n['walltime_y']
 
 f=n.query("returnvalue==0")
-s=f.groupby('imp')['norm'].apply(gmean).sort_values()
-f['imp']=Categorical(f['imp'],categories=s.index,ordered=True)
+s=f.groupby('impl')['norm'].apply(gmean).sort_values()
+f['impl']=Categorical(f['impl'],categories=s.index,ordered=True)
 g = (
-    f.groupby(['imp'])['norm']
+    f.groupby(['impl'])['norm']
     .agg(ymin='min', ymax='max',centre=gmean)
     .reset_index()
 )
 print(g)
-p=(ggplot(g, aes(x='imp',y='centre'))
+p=(ggplot(g, aes(x='impl',y='centre'))
  + geom_errorbar(aes(ymin='ymin', ymax='ymax'), color='gray', width=0.2, size=1)
  + geom_point(size=3, color='gray')
  + theme_light()
