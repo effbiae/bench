@@ -7,7 +7,7 @@ all:..[knucleotide:25;nbody:23;spectralnorm:12;collatz:18;mandelbrot:13;fft:23] 
 rnds:("knucleotide""nbody";"collatz""spectralnorm";"mandelbrot""fft")
 say ARGS[1];?["r"=*a:""\ARGS[1];rnd:"i"$+/1_a;rnd:#rnds];?[rnd;rge:rnds[rnd-1]#all;rge:(*|rnds)#all];say rnd,rge;
 gen:..[knucleotide:"fasta"] /what program generates input
-gcco:"-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp -lm -lfftw3"
+gcco:"-pipe -Wall -O3 -fomit-frame-pointer -march=native -fopenmp -lm -lfftw3_omp -lfftw3"
 bash:{say x;run"bash""-c",x}
 corescmd:rq#cat $(find /sys/devices/system/cpu -regex ".*cpu[0-9]+/topology/thread_siblings_list") |sort -n |uniq |cut -d, -f1#
 say"cores "+cores:","/=-bash corescmd

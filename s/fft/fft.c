@@ -1,4 +1,5 @@
-// gcc -O3 -march=native fft.c -lfftw3 -lm -o fft
+// gcc -offt4 -O3 -march=native fft4.c -lfftw3_omp -lfftw3 -lm
+// run with: OMP_NUM_THREADS=4 (environment variable)
 #include <math.h>
 #include <fftw3.h>
 #include <stdint.h>
@@ -96,6 +97,8 @@ int main(int argc, char **argv)
     int n = (int)parsed_n;
     int bins = n / 2;  /* Matches Python's fft_raw[:N // 2]. */
 
+    fftw_init_threads();
+
     double *input = fftw_alloc_real((size_t)n);
     fftw_complex *output = fftw_alloc_complex((size_t)(n / 2 + 1));
     if (!input || !output) {
@@ -110,6 +113,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < n; ++i)
         input[i] = (double)rng() / 32768.0 - 1.0;
 
+    fftw_plan_with_nthreads(4);
     fftw_plan plan = fftw_plan_dft_r2c_1d(n, input, output, FFTW_ESTIMATE);
     if (!plan) {
         fprintf(stderr, "Could not create FFTW plan\n");
